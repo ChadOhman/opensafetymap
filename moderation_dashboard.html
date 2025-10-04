@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Moderation Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Moderation Dashboard</h1>
+
+    <div class="section">
+      <h2>Settings</h2>
+      <label><input type="checkbox" id="requireApproval"> Require approval before publishing reports</label>
+    </div>
+
+    <div class="section">
+      <h2>Pending Reports</h2>
+      <div id="reports"></div>
+    </div>
+
+    <div class="section">
+      <h2>Flagged Content</h2>
+      <div id="flags"></div>
+    </div>
+
+    <div class="section">
+      <h2>Moderation Analytics</h2>
+      <div id="analyticsSummary"></div>
+      <canvas id="trendChart" width="800" height="400"></canvas>
+    </div>
+
+    <div class="section">
+      <h2>Moderation Log</h2>
+      <div class="filters">
+        <label>Action:
+          <select id="actionFilter">
+            <option value="">All</option>
+            <option value="report_approve">Report Approved</option>
+            <option value="report_reject">Report Rejected</option>
+            <option value="user_ban">User Banned</option>
+            <option value="user_unban">User Unbanned</option>
+            <option value="flag_dismiss">Flag Dismissed</option>
+            <option value="flag_remove">Flag Removed</option>
+          </select>
+        </label>
+        <label style="margin-left:20px;">Search:
+          <input type="text" id="logSearch" placeholder="Moderator, target ID, notes...">
+        </label>
+        <label style="margin-left:20px;">Start:
+          <input type="date" id="startDate">
+        </label>
+        <label style="margin-left:10px;">End:
+          <input type="date" id="endDate">
+        </label>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>Moderator</th><th>Action</th><th>Target</th><th>Details</th><th>Notes</th><th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="logTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module" src="../assets/js/moderation.js"></script>
+</body>
+</html>

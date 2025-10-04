@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Moderation Log</title>
+  <script type="module" src="assets/js/moderation.js"></script>
+<script type="module" src="assets/js/report_submission.js"></script>
+<script type="module" src="assets/js/user_profile.js"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; }
+    .container { max-width: 1000px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    h1 { margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 8px; border-bottom: 1px solid #ddd; }
+    th { background: #0077cc; color: white; }
+    tr:hover { background: #f1f1f1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Moderation Log</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Moderator</th>
+          <th>Action</th>
+          <th>Target</th>
+          <th>Details</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody id="logTableBody"></tbody>
+    </table>
+  </div>
+  <script src="assets/js/moderation_log.js"></script>
+</body>
+</html>

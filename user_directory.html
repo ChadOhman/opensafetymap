@@ -1,0 +1,46 @@
+<div class="container">
+  <h1>User Directory</h1>
+
+  <div style="margin-bottom:10px;">
+    <input type="text" id="searchBox" placeholder="Search by name or email..." style="width:40%; padding:8px;">
+    
+    <label for="roleFilter">Role:</label>
+    <select id="roleFilter">
+      <option value="">All</option>
+      <option value="user">User</option>
+      <option value="moderator">Moderator</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <label for="statusFilter">Status:</label>
+    <select id="statusFilter">
+      <option value="">All</option>
+      <option value="active">Active</option>
+      <option value="banned">Banned</option>
+    </select>
+
+    <button onclick="applyFilters()">Apply</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Provider</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Joined</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="userTableBody"></tbody>
+  </table>
+
+  <div style="margin-top:10px; text-align:center;">
+    <button onclick="prevPage()">Previous</button>
+    <span id="pageInfo"></span>
+    <button onclick="nextPage()">Next</button>
+  </div>
+</div>

@@ -1,0 +1,141 @@
+/* Reset / Base */
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f7f9;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+a {
+  color: #0077cc;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 20px auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+h1, h2 {
+  margin-top: 0;
+}
+h1 {
+  color: #222;
+}
+h2 {
+  color: #444;
+  margin-top: 30px;
+}
+
+/* Forms */
+form {
+  display: block;
+  margin-top: 10px;
+}
+label {
+  display: block;
+  margin: 8px 0;
+  font-weight: bold;
+}
+input, select, textarea, button {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: inherit;
+}
+textarea {
+  min-height: 80px;
+}
+button {
+  background: #0077cc;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+button:hover {
+  background: #005fa3;
+}
+button.approve { background: #2a9d8f; }
+button.reject { background: #e63946; }
+button.dismiss { background: #ffb703; color: black; }
+button.remove { background: #d62828; }
+
+/* Cards */
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: #fafafa;
+}
+.card img {
+  max-width: 150px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+th {
+  background: #0077cc;
+  color: white;
+  text-align: left;
+}
+tr:hover {
+  background: #f9f9f9;
+}
+
+/* Status Labels */
+.status-approved { color: green; font-weight: bold; }
+.status-rejected { color: red; font-weight: bold; }
+.status-pending { color: orange; font-weight: bold; }
+
+/* Layout Helpers */
+.section {
+  margin-bottom: 40px;
+}
+.filters {
+  margin: 10px 0;
+  padding: 10px;
+  background: #f7f7f7;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+/* Alerts (basic) */
+.alert {
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+}
+.alert-success {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+.alert-error {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}

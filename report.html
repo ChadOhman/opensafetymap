@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Submit Incident Report</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+    .container { max-width: 800px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    h1 { text-align: center; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    select, textarea, input[type="file"], button { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; }
+    #map { height: 300px; margin-top: 10px; border-radius: 8px; }
+    button { background: #0077cc; color: #fff; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    button:hover { background: #005fa3; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Report an Incident</h1>
+    <form id="reportForm" enctype="multipart/form-data">
+      
+      <label for="category">Category</label>
+      <select id="category" name="category" required>
+        <option value="pedestrian">Pedestrian</option>
+        <option value="cyclist">Cyclist</option>
+        <option value="vehicle">Motor Vehicle</option>
+      </select>
+      
+      <label for="severity">Severity</label>
+      <select id="severity" name="severity" required>
+        <option value="minor">Minor</option>
+        <option value="major">Major</option>
+        <option value="critical">Critical</option>
+      </select>
+      
+      <label for="incident_type">Incident Type</label>
+      <select id="incident_type" name="incident_type" required>
+        <option value="accident">Accident</option>
+        <option value="near-miss">Near Miss</option>
+      </select>
+      
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="4" placeholder="Describe what happened..." required></textarea>
+      
+      <label>Click on the map to set location</label>
+      <div id="map"></div>
+      <input type="hidden" id="latitude" name="latitude" required>
+      <input type="hidden" id="longitude" name="longitude" required>
+      
+      <label for="photo">Photo (optional)</label>
+      <input type="file" id="photo" name="photo" accept="image/*">
+      
+      <button type="submit">Submit Report</button>
+    </form>
+    
+    <div id="message" style="margin-top:15px; font-weight:bold;"></div>
+  </div>
+  
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="assets/js/report.js"></script>
+</body>
+</html>

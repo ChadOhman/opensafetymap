@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Accident Reports - Edmonton</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    #map { height: 500px; margin: 15px 0; }
+    form { background: #fff; padding: 15px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Edmonton Accident & Near Miss Reports</h1>
+    <div id="map"></div>
+
+    <h2>Submit a Report</h2>
+    <form id="reportForm">
+      <label>Category:
+        <select name="category_id">
+          <option value="1">Pedestrian</option>
+          <option value="2">Cyclist</option>
+          <option value="3">Motor Vehicle</option>
+        </select>
+      </label><br>
+      <label>Severity:
+        <select name="severity_id">
+          <option value="1">Minor</option>
+          <option value="2">Moderate</option>
+          <option value="3">Severe</option>
+        </select>
+      </label><br>
+      <label>Incident Type:
+        <select name="incident_type_id">
+          <option value="1">Accident</option>
+          <option value="2">Near Miss</option>
+        </select>
+      </label><br>
+      <textarea name="description" placeholder="Describe what happened..." required></textarea><br>
+      <input type="hidden" name="latitude" id="lat">
+      <input type="hidden" name="longitude" id="lng">
+      <label>Upload Photo: <input type="file" name="photo"></label><br>
+      <button type="submit">Submit Report</button>
+    </form>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+  <script type="module" src="../assets/js/map.js"></script>
+  <script type="module" src="../assets/js/report_submission.js"></script>
+</body>
+</html>

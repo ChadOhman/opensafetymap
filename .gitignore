@@ -1,0 +1,22 @@
+# OS / Editor files
+.DS_Store
+Thumbs.db
+*.swp
+
+# Logs
+*.log
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Cache / Temp
+.cache/
+dist/
+build/
+tmp/

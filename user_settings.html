@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Settings</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; }
+    .container { max-width: 600px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    select, input, button { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; }
+    button { margin-top: 15px; background:#0077cc; color:white; cursor:pointer; }
+    button:hover { background:#005fa3; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>User Settings</h1>
+    <form id="settingsForm">
+      <label for="username">Username/Alias</label>
+      <input type="text" id="username" name="username" required>
+
+      <label for="privacy">Profile Privacy</label>
+      <select id="privacy" name="privacy">
+        <option value="public">Public</option>
+        <option value="logged-in">Visible to Logged-in Users Only</option>
+        <option value="private">Private (Admins/Moderators Only)</option>
+      </select>
+
+      <button type="submit">Save Settings</button>
+    </form>
+    <p id="message"></p>
+  </div>
+  <script src="assets/js/user_settings.js"></script>
+</body>
+</html>

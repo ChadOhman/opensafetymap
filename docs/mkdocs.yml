@@ -1,0 +1,30 @@
+site_name: Edmonton Accident & Near Miss Reporting Platform
+site_description: Community-driven reporting and moderation platform for Edmonton traffic safety.
+site_author: Open Source Contributors
+repo_url: https://github.com/your-org/accident-reports
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+    - toc.integrate
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Getting Started: quickstart.md
+  - Features: features.md
+  - Contributing: contributing.md
+  - Roadmap: roadmap.md
+  - Changelog: changelog.md
+  - Database: database.md
+  - Moderation: moderation.md
+  - Analytics: analytics.md
+  - User Guide: user_guide.md
+  - Moderator Guide: moderator_guide.md
+  - Admin Guide: admin_guide.md
+  - Developer Guide: developer_guide.md
+  - Architecture: architecture.md
+  - Glossary: glossary.md
+  - FAQ: faq.md
+  - Setup: setup.md
