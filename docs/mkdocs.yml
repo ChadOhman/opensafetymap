@@ -1,7 +1,7 @@
-site_name: Edmonton Accident & Near Miss Reporting Platform
+site_name: OpenSafetyMap
 site_description: Community-driven reporting and moderation platform for Edmonton traffic safety.
 site_author: Open Source Contributors
-repo_url: https://github.com/your-org/accident-reports
+repo_url: https://github.com/ChadOhman/opensafetymap
 theme:
   name: material
   features:
