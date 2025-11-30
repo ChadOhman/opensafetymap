@@ -2,52 +2,90 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Accident Reports - Edmonton</title>
-  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <style>
-    #map { height: 500px; margin: 15px 0; }
-    form { background: #fff; padding: 15px; border-radius: 8px; }
-  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Edmonton Accident & Near Miss Reports</h1>
-    <div id="map"></div>
+  <main class="container">
+    <header class="page-header">
+      <h1>Edmonton Accident &amp; Near Miss Reports</h1>
+      <p class="page-intro">Review recent reports, then share what you experienced so we can improve safety together.</p>
+    </header>
 
-    <h2>Submit a Report</h2>
-    <form id="reportForm">
-      <label>Category:
-        <select name="category_id">
-          <option value="1">Pedestrian</option>
-          <option value="2">Cyclist</option>
-          <option value="3">Motor Vehicle</option>
-        </select>
-      </label><br>
-      <label>Severity:
-        <select name="severity_id">
-          <option value="1">Minor</option>
-          <option value="2">Moderate</option>
-          <option value="3">Severe</option>
-        </select>
-      </label><br>
-      <label>Incident Type:
-        <select name="incident_type_id">
-          <option value="1">Accident</option>
-          <option value="2">Near Miss</option>
-        </select>
-      </label><br>
-      <textarea name="description" placeholder="Describe what happened..." required></textarea><br>
-      <input type="hidden" name="latitude" id="lat">
-      <input type="hidden" name="longitude" id="lng">
-      <label>Upload Photo: <input type="file" name="photo"></label><br>
-      <button type="submit">Submit Report</button>
-    </form>
-  </div>
+    <section class="map-section" aria-labelledby="map-heading">
+      <div class="section-header">
+        <h2 id="map-heading">Incident map</h2>
+        <p class="helper-text">Tap or click to explore existing reports. Select a spot to fill in its coordinates before submitting your own.</p>
+      </div>
+      <div id="map" class="map-frame" role="application" aria-label="Map of Edmonton showing accident and near miss reports"></div>
+      <p id="locationStatus" class="helper-text" aria-live="polite">No location selected yet. Choose a point on the map to set latitude and longitude.</p>
+    </section>
+
+    <section aria-labelledby="reportFormTitle">
+      <div class="section-header">
+        <h2 id="reportFormTitle">Submit a Report</h2>
+        <p class="helper-text">Complete each field. Required inputs are marked with an asterisk (*).</p>
+      </div>
+      <form id="reportForm" class="form-surface" novalidate>
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="category_id">Category <span aria-hidden="true">*</span></label>
+            <select id="category_id" name="category_id" required>
+              <option value="" disabled selected>Select a category</option>
+              <option value="1">Pedestrian</option>
+              <option value="2">Cyclist</option>
+              <option value="3">Motor Vehicle</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="severity_id">Severity <span aria-hidden="true">*</span></label>
+            <select id="severity_id" name="severity_id" required>
+              <option value="" disabled selected>Select severity</option>
+              <option value="1">Minor</option>
+              <option value="2">Moderate</option>
+              <option value="3">Severe</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="incident_type_id">Incident Type <span aria-hidden="true">*</span></label>
+            <select id="incident_type_id" name="incident_type_id" required>
+              <option value="" disabled selected>Select incident type</option>
+              <option value="1">Accident</option>
+              <option value="2">Near Miss</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="description">Description <span aria-hidden="true">*</span></label>
+          <textarea id="description" name="description" placeholder="Describe what happened..." required></textarea>
+        </div>
+
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
+
+        <div class="form-field">
+          <label for="photo_url">Photo URL</label>
+          <input type="url" name="photo_url" id="photo_url" inputmode="url" placeholder="https://example.com/image.jpg">
+          <p class="helper-text">Share a direct link to an image. Files are optional.</p>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="primary">Submit Report</button>
+        </div>
+        <div id="formFeedback" class="alert" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+  </main>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-  <script type="module" src="../assets/js/map.js"></script>
-  <script type="module" src="../assets/js/report_submission.js"></script>
+  <script type="module" src="./assets/js/map.js"></script>
 </body>
 </html>
