@@ -3,89 +3,227 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Accident Reports - Edmonton</title>
+  <title>Open Safety Map</title>
   <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 </head>
 <body>
   <main class="container">
     <header class="page-header">
-      <h1>Edmonton Accident &amp; Near Miss Reports</h1>
-      <p class="page-intro">Review recent reports, then share what you experienced so we can improve safety together.</p>
+      <h1>Open Safety Map</h1>
+      <p class="page-intro">Capture road safety issues, let drivers respond, and empower admins to moderate. All public map data shows only the first three letters of a license plate.</p>
+      <nav class="top-nav" aria-label="Page sections">
+        <a href="#reporting">Submit report</a>
+        <a href="#public-map">Public map</a>
+        <a href="#driver-portal">Driver portal</a>
+        <a href="#admin">Admin &amp; moderation</a>
+      </nav>
     </header>
 
-    <section class="map-section" aria-labelledby="map-heading">
+    <section id="reporting" class="section" aria-labelledby="reportingTitle">
       <div class="section-header">
-        <h2 id="map-heading">Incident map</h2>
-        <p class="helper-text">Tap or click to explore existing reports. Select a spot to fill in its coordinates before submitting your own.</p>
+        <h2 id="reportingTitle">Report a near-miss or incident</h2>
+        <p class="helper-text">Share the location, describe what happened, and attach photos or video. Categories are simplified to keep reporting fast.</p>
       </div>
-      <div id="map" class="map-frame" role="application" aria-label="Map of Edmonton showing accident and near miss reports"></div>
-      <p id="locationStatus" class="helper-text" aria-live="polite">No location selected yet. Choose a point on the map to set latitude and longitude.</p>
+      <div class="page-grid">
+        <form id="reportForm" class="form-surface" novalidate>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="reporterName">Your name (optional)</label>
+              <input id="reporterName" name="reporterName" autocomplete="name" placeholder="Pat Jordan">
+            </div>
+            <div class="form-field">
+              <label for="reporterContact">Notify me at</label>
+              <input id="reporterContact" name="reporterContact" type="email" autocomplete="email" placeholder="you@example.com" aria-describedby="notifyHelp">
+              <p id="notifyHelp" class="helper-text">We'll notify you when a driver responds or an admin updates your report.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="plate">License plate <span aria-hidden="true">*</span></label>
+              <input id="plate" name="plate" required placeholder="ABC1234" autocomplete="off" aria-describedby="plateHelp">
+              <p id="plateHelp" class="helper-text">Only the first three letters will appear publicly.</p>
+            </div>
+            <div class="form-field">
+              <label for="incidentCategory">Category <span aria-hidden="true">*</span></label>
+              <select id="incidentCategory" name="incidentCategory" required>
+                <option value="" disabled selected>Select</option>
+                <option value="Accident">Accident</option>
+                <option value="Near-miss">Near-miss</option>
+                <option value="Irritant">Irritant (high beams, no lights, noise)</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="incidentType">What happened? <span aria-hidden="true">*</span></label>
+              <select id="incidentType" name="incidentType" required>
+                <option value="" disabled selected>Select</option>
+                <option>Collision</option>
+                <option>Close pass / near-miss</option>
+                <option>High beams or no lights</option>
+                <option>Blocked crosswalk or bike lane</option>
+                <option>Speeding / aggressive driving</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="description">Describe the situation <span aria-hidden="true">*</span></label>
+            <textarea id="description" name="description" required placeholder="Share what you saw, time of day, vehicles involved, and context."></textarea>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="photoEvidence">Attach photos</label>
+              <input id="photoEvidence" name="photoEvidence" type="file" accept="image/*" multiple>
+              <p class="helper-text">You can add registration photos, scene photos, or plate images.</p>
+            </div>
+            <div class="form-field">
+              <label for="videoEvidence">Attach video or link</label>
+              <input id="videoEvidence" name="videoEvidence" type="url" placeholder="https://example.com/clip.mp4" aria-describedby="videoHelp">
+              <p id="videoHelp" class="helper-text">Paste a link to dashcam footage or upload a clip.</p>
+            </div>
+          </div>
+
+          <input type="hidden" name="latitude" id="latitude">
+          <input type="hidden" name="longitude" id="longitude">
+          <p class="helper-text">Tap the map to set location. Coordinates are required for publishing.</p>
+
+          <div class="form-actions">
+            <button type="submit" class="primary">Submit report</button>
+            <button type="reset" class="secondary">Reset</button>
+          </div>
+          <div id="formFeedback" class="alert" role="status" aria-live="polite"></div>
+        </form>
+
+        <div class="panel stack" aria-live="polite">
+          <div>
+            <h3 class="panel-title">Fast categories</h3>
+            <p class="panel-description">Use the simplified list to classify near-misses, accidents, irritants (high beams or no lights), and "other" cases.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><strong>Need to include plates?</strong><span class="badge badge-warning">Privacy-safe</span></div>
+            <p class="card-meta">Only the first three letters appear on the public map so reporters and drivers stay safe while collaborating.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><strong>Evidence</strong><span class="badge badge-primary">Photos &amp; video</span></div>
+            <p class="card-meta">Upload photos of registration papers or a clear plate shot to help drivers verify and reply quickly.</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><strong>Notification</strong><span class="badge badge-success">Reporter updates</span></div>
+            <p class="card-meta">When a driver responds, the reporter gets a notification summary.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section aria-labelledby="reportFormTitle">
+    <section id="public-map" class="section" aria-labelledby="publicMapTitle">
       <div class="section-header">
-        <h2 id="reportFormTitle">Submit a Report</h2>
-        <p class="helper-text">Complete each field. Required inputs are marked with an asterisk (*).</p>
+        <h2 id="publicMapTitle">Public map &amp; anonymized feed</h2>
+        <p class="helper-text">All public markers show only the first three letters of a plate. Both reporter and driver comments appear after moderation.</p>
       </div>
-      <form id="reportForm" class="form-surface" novalidate>
+      <div class="map-section">
         <div class="form-grid">
           <div class="form-field">
-            <label for="category_id">Category <span aria-hidden="true">*</span></label>
-            <select id="category_id" name="category_id" required>
-              <option value="" disabled selected>Select a category</option>
-              <option value="1">Pedestrian</option>
-              <option value="2">Cyclist</option>
-              <option value="3">Motor Vehicle</option>
+            <label for="categoryFilter">Category filter</label>
+            <select id="categoryFilter" name="categoryFilter">
+              <option value="All">All</option>
+              <option value="Accident">Accident</option>
+              <option value="Near-miss">Near-miss</option>
+              <option value="Irritant">Irritant</option>
+              <option value="Other">Other</option>
             </select>
           </div>
-
           <div class="form-field">
-            <label for="severity_id">Severity <span aria-hidden="true">*</span></label>
-            <select id="severity_id" name="severity_id" required>
-              <option value="" disabled selected>Select severity</option>
-              <option value="1">Minor</option>
-              <option value="2">Moderate</option>
-              <option value="3">Severe</option>
+            <label for="visibilityFilter">Include pending items</label>
+            <select id="visibilityFilter" name="visibilityFilter">
+              <option value="published">Published only</option>
+              <option value="pending">Include pending</option>
             </select>
           </div>
+        </div>
+        <div id="map" class="map-frame" role="application" aria-label="OpenStreetMap of anonymized safety reports"></div>
+        <p id="locationStatus" class="helper-text" aria-live="polite">No location selected yet. Choose a point on the map to set latitude and longitude.</p>
+      </div>
+      <div class="panel">
+        <h3 class="panel-title">Recent public reports</h3>
+        <div id="publicFeed" class="feed" aria-live="polite"></div>
+      </div>
+    </section>
 
+    <section id="driver-portal" class="section" aria-labelledby="driverPortalTitle">
+      <div class="section-header">
+        <h2 id="driverPortalTitle">Driver verification &amp; responses</h2>
+        <p class="helper-text">Drivers can verify with a registration number or a clear plate photo, then respond. Reporters are notified automatically.</p>
+      </div>
+      <div class="page-grid">
+        <form id="driverVerificationForm" class="form-surface" novalidate>
           <div class="form-field">
-            <label for="incident_type_id">Incident Type <span aria-hidden="true">*</span></label>
-            <select id="incident_type_id" name="incident_type_id" required>
-              <option value="" disabled selected>Select incident type</option>
-              <option value="1">Accident</option>
-              <option value="2">Near Miss</option>
-            </select>
+            <label for="driverPlate">License plate <span aria-hidden="true">*</span></label>
+            <input id="driverPlate" name="driverPlate" required placeholder="ABC1234">
+            <p class="helper-text">Full plate required for verification. Public view shows only the first three letters.</p>
           </div>
-        </div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="registrationNumber">Registration paper number</label>
+              <input id="registrationNumber" name="registrationNumber" placeholder="Document or permit number" autocomplete="off">
+            </div>
+            <div class="form-field">
+              <label for="platePhoto">Upload plate photo</label>
+              <input id="platePhoto" name="platePhoto" type="file" accept="image/*">
+            </div>
+          </div>
+          <p class="helper-text">Submit at least one verification method to view reports linked to your plate.</p>
+          <div class="form-actions">
+            <button type="submit" class="primary">Verify &amp; view reports</button>
+            <button type="reset" class="secondary">Clear</button>
+          </div>
+          <div id="driverFeedback" class="alert" role="status" aria-live="polite"></div>
+        </form>
 
-        <div class="form-field">
-          <label for="description">Description <span aria-hidden="true">*</span></label>
-          <textarea id="description" name="description" placeholder="Describe what happened..." required></textarea>
+        <div class="panel">
+          <h3 class="panel-title">Respond to reports</h3>
+          <p class="panel-description">Verified drivers can reply with context, proof of corrections, or to contest a report. Reporters are notified after each response.</p>
+          <div id="driverReports" class="stack"></div>
         </div>
+      </div>
+    </section>
 
-        <input type="hidden" name="latitude" id="latitude">
-        <input type="hidden" name="longitude" id="longitude">
+    <section id="admin" class="section" aria-labelledby="adminTitle">
+      <div class="section-header">
+        <h2 id="adminTitle">Admin moderation &amp; user roles</h2>
+        <p class="helper-text">Admins and moderators can edit, remove, and approve reports or responses. User management assigns Admin and Moderator roles separately.</p>
+      </div>
 
-        <div class="form-field">
-          <label for="photo_url">Photo URL</label>
-          <input type="url" name="photo_url" id="photo_url" inputmode="url" placeholder="https://example.com/image.jpg">
-          <p class="helper-text">Share a direct link to an image. Files are optional.</p>
-        </div>
+      <div class="panel">
+        <h3 class="panel-title">Moderate reports</h3>
+        <div id="moderationQueue" class="stack"></div>
+      </div>
 
-        <div class="form-actions">
-          <button type="submit" class="primary">Submit Report</button>
-        </div>
-        <div id="formFeedback" class="alert" role="status" aria-live="polite"></div>
-      </form>
+      <div class="panel">
+        <h3 class="panel-title">User management</h3>
+        <p class="panel-description">Designate admins and moderators. Changes take effect immediately.</p>
+        <table aria-label="User roles">
+          <thead>
+            <tr>
+              <th scope="col">User</th>
+              <th scope="col">Email</th>
+              <th scope="col">Role</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody"></tbody>
+        </table>
+      </div>
     </section>
   </main>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-  <script type="module" src="./assets/js/map.js"></script>
+  <script type="module" src="./assets/js/web_ui.js"></script>
 </body>
 </html>
