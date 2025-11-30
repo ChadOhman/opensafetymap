@@ -215,6 +215,16 @@ php -S localhost:8000 -t public
 
 Open [http://localhost:8000](http://localhost:8000).
 
+### 6. Offline-friendly validation
+When npm-based tooling is blocked by the network proxy, you can still run basic checks to avoid regressions:
+
+```bash
+python tools/html_checks.py index.html
+python tools/a11y_checks.py index.html
+```
+
+These scripts verify document structure, labeling, and key accessibility affordances without downloading external packages.
+
 ---
 
 ## 🔒 Roles & Permissions

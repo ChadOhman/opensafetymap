@@ -1,0 +1,11 @@
+# Agent Guidelines
+- Prioritize accessibility and mobile friendliness when editing or creating content. Test layouts on small screens and ensure form controls, map interactions, and text remain usable with assistive technologies and keyboard navigation.
+- Keep styling in `css/` and scripting in `js/`; avoid inline styles or scripts. Prefer reusable utility classes or shared patterns.
+- In PR summaries, use concise bullet points for notable changes and enumerate any manual or automated checks run.
+- Run appropriate validations for code changes:
+  - Perform HTML checks for markup updates.
+  - Run Pa11y for layout or functionality adjustments (skip for text-only edits).
+  - Run Linkinator only when links change.
+- Whenever code changes touch workflows or contributor steps, update `README.md` or related docs to keep guidance accurate.
+- Use offline-friendly validation when the network blocks npm installs: `python tools/html_checks.py <file>` and `python tools/a11y_checks.py <file>` for each modified HTML document. Prefer the standard npm-based tools when available.
+- Document the exact validation commands you execute in PR summaries to streamline reviews.
