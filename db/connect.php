@@ -1,7 +1,10 @@
 <?php
-$dsn = "mysql:host=localhost;dbname=accidents;charset=utf8mb4";
-$user = "dbuser";
-$pass = "dbpass";
+$dbHost = getenv('DB_HOST') ?: 'localhost';
+$dbName = getenv('DB_NAME') ?: 'accidents';
+$user = getenv('DB_USER') ?: 'dbuser';
+$pass = getenv('DB_PASS') ?: 'dbpass';
+
+$dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
 
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
