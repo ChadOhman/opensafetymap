@@ -225,6 +225,15 @@ python tools/a11y_checks.py index.html
 
 These scripts verify document structure, labeling, and key accessibility affordances without downloading external packages.
 
+## 📈 Automated quality checks
+
+- **CI/CD:** `.github/workflows/ci.yml` runs PHP linting and SQL schema validation on every pull request.
+- **Lighthouse CI:** `.github/workflows/lighthouse.yml` audits key pages for mobile performance, accessibility, and SEO using `.lighthouserc.json`. Run the same checks locally with:
+
+```bash
+npx lhci autorun --config=.lighthouserc.json
+```
+
 ---
 
 ## 🔒 Roles & Permissions
