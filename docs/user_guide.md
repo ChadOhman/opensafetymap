@@ -3,7 +3,7 @@
 > 🟢 New here? Start with the [Setup Guide](setup.md) to get your environment running quickly.
 
 
-This guide explains how to use OpenSafetyMap as an end user.
+This guide explains how to use the Edmonton Accident & Near Miss Reporting Platform as an end user.
 
 ---
 

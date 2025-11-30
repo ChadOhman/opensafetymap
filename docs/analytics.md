@@ -18,3 +18,4 @@ The **Analytics Dashboard** provides insights into reports, moderation activity,
 ## Future Enhancements
 - Moderator performance leaderboard (actions, resolution time).  
 - Heatmap overlay for geospatial clustering of incidents.  
+- Export analytics as CSV/Excel.  

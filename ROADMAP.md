@@ -1,8 +1,13 @@
 # 🗺️ Project Roadmap
 
 [![CI/CD](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml/badge.svg)](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml)
-[![GitHub release](https://img.shields.io/github/v/release/ChadOhman/opensafetymap)](https://github.com/ChadOhman/opensafetymap/releases)
-[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://ChadOhman.github.io/opensafetymap/)
+[![GitHub release](https://img.shields.io/github/v/release/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/releases)
+[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://chadohman.github.io/opensafetymap/)
+[![Docs](https://img.shields.io/badge/docs-view-blue.svg)](https://chadohman.github.io/opensafetymap/)
+
+
+[![CI/CD](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml/badge.svg)](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml)
+[![GitHub release](https://img.shields.io/github/v/release/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/releases)
 
 
 This roadmap outlines upcoming features, improvements, and long-term goals for the Edmonton Accident & Near Miss Reporting Platform.
@@ -25,15 +30,16 @@ This roadmap outlines upcoming features, improvements, and long-term goals for t
 ---
 
 ## 🎯 Short-Term Goals
+- [ ] Add moderator performance analytics (leaderboard by actions/resolution time)
 - [ ] Implement heatmap visualization on map
+- [ ] Export moderation logs to CSV/Excel
 - [ ] Add email notifications for report approvals/rejections
 - [ ] Improve UI styling with responsive design and mobile-friendly layouts
-- [ ] Tagging license plates to incidents, owners to be able to look up their plate to see if there are any tagged incidents
 
 ---
 
 ## 🚀 Mid-Term Goals
-- [ ] Add French language support
+- [ ] Add multi-language support (English + French initially)
 - [ ] Implement notifications system (in-app alerts for comments, flags, moderation actions)
 - [ ] Enhance reporting form with step-by-step wizard and improved UX
 - [ ] Add batch moderation actions for efficiency

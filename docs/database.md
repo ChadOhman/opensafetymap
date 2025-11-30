@@ -17,4 +17,4 @@ This project uses a **MySQL database** with normalized tables for users, reports
 
 ---
 
-For details, see the schema in [seed.sql](../sql/seed.sql).
+For details, see the schema in [seed.sql](../seed.sql).

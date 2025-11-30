@@ -3,7 +3,7 @@ version: "3.8"
 services:
   app:
     build: .
-    container_name: opensafetymap
+    container_name: accident-reports-app
     ports:
       - "8080:80"
     volumes:
@@ -14,17 +14,17 @@ services:
       - db
     environment:
       DB_HOST: db
-      DB_NAME: opensafetymap
+      DB_NAME: accident_reports
       DB_USER: root
       DB_PASS: example
 
   db:
     image: mysql:8.0
-    container_name: opensafetymap-db
+    container_name: accident-reports-db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
-      MYSQL_DATABASE: opensafetymap
+      MYSQL_DATABASE: accident_reports
     ports:
       - "3306:3306"
     volumes:

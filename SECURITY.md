@@ -1,6 +1,9 @@
 # 🔒 Security Policy
 
-[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://ChadOhman.github.io/opensafetymap/)
+[![CI/CD](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml/badge.svg)](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml)
+[![GitHub release](https://img.shields.io/github/v/release/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/releases)
+[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://chadohman.github.io/opensafetymap/)
+
 
 ## Supported Versions
 
@@ -20,14 +23,14 @@ Older tags and experimental branches may not receive security updates.
 If you discover a security vulnerability, please **do not** open a public issue.  
 Instead, report it responsibly by emailing:
 
-**chad@ohman.ca**
+**security@example.com**
 
 Please include:
 - A clear description of the vulnerability
 - Steps to reproduce
 - Potential impact
 
-We will review and respond, and work to release a fix promptly.
+We will review and respond within **7 days**, and work to release a fix promptly.
 
 ---
 

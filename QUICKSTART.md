@@ -1,19 +1,20 @@
 # 🚀 Getting Started (Quick Guide)
 
 [![CI/CD](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml/badge.svg)](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml)
-[![GitHub release](https://img.shields.io/github/v/release/ChadOhman/opensafetymap)](https://github.com/ChadOhman/opensafetymap/releases)
-[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://ChadOhman.github.io/opensafetymap/)
-[![Setup Guide](https://img.shields.io/badge/setup-guide-brightgreen.svg)](https://ChadOhman.github.io/opensafetymap/setup/)
+[![GitHub release](https://img.shields.io/github/v/release/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/releases)
+[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://chadohman.github.io/opensafetymap/)
+[![Docs](https://img.shields.io/badge/docs-view-blue.svg)](https://chadohman.github.io/opensafetymap/)
+[![Setup Guide](https://img.shields.io/badge/setup-guide-brightgreen.svg)](https://chadohman.github.io/opensafetymap/setup/)
 
 
 [![CI/CD](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml/badge.svg)](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml)
-[![GitHub release](https://img.shields.io/github/v/release/ChadOhman/opensafetymap)](https://github.com/ChadOhman/opensafetymap/releases)
+[![GitHub release](https://img.shields.io/github/v/release/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/releases)
 
 
 ## 1. Clone the repo
 ```bash
 git clone https://github.com/ChadOhman/opensafetymap.git
-cd opensafetymap
+cd accident-reports
 ```
 
 ## 2. Import the database

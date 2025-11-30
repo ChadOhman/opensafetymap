@@ -1,6 +1,6 @@
 # 📖 Glossary
 
-This glossary defines key terms used throughout OpenSafetyMap.
+This glossary defines key terms used throughout the Edmonton Accident & Near Miss Reporting Platform.
 
 ---
 

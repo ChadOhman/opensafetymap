@@ -1,19 +1,26 @@
-# 🚦 OpenSafetyMap 
-
-## An Accident & Near Miss Reporting Platform
+# 🚦 Edmonton Accident & Near Miss Reporting Platform
+![System Overview](docs/system_overview.png)
 
 [![CI/CD](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml/badge.svg)](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/ChadOhman/opensafetymap)](https://github.com/ChadOhman/opensafetymap/releases)
-[![Contributors](https://img.shields.io/github/contributors/ChadOhman/opensafetymap)](https://github.com/ChadOhman/opensafetymap/graphs/contributors)
-[![Open Issues](https://img.shields.io/github/issues/ChadOhman/opensafetymap)](https://github.com/ChadOhman/opensafetymap/issues)
-[![Open PRs](https://img.shields.io/github/issues-pr/ChadOhman/opensafetymap)](https://github.com/ChadOhman/opensafetymap/pulls)
-[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://ChadOhman.github.io/opensafetymap/)
-[![Docs](https://img.shields.io/badge/docs-view-blue.svg)](https://ChadOhman.github.io/opensafetymap/)
-[![Setup Guide](https://img.shields.io/badge/setup-guide-brightgreen.svg)](https://ChadOhman.github.io/opensafetymap/setup/)
+[![GitHub release](https://img.shields.io/github/v/release/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/releases)
+[![Contributors](https://img.shields.io/github/contributors/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/graphs/contributors)
+[![Open Issues](https://img.shields.io/github/issues/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/issues)
+[![Open PRs](https://img.shields.io/github/issues-pr/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/pulls)
+[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://chadohman.github.io/opensafetymap/)
+[![Docs](https://img.shields.io/badge/docs-view-blue.svg)](https://chadohman.github.io/opensafetymap/)
+[![Setup Guide](https://img.shields.io/badge/setup-guide-brightgreen.svg)](https://chadohman.github.io/opensafetymap/setup/)
 
 
-A community-driven web application for reporting, tracking, and moderating traffic-related **accidents and near misses**.  
+[![CI/CD](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml/badge.svg)](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/releases)
+[![Contributors](https://img.shields.io/github/contributors/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/graphs/contributors)
+[![Open Issues](https://img.shields.io/github/issues/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/issues)
+[![Open PRs](https://img.shields.io/github/issues-pr/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/pulls)
+
+
+A community-driven web application for reporting, tracking, and moderating traffic-related **accidents and near misses** in Edmonton.  
 Built with **PHP + MySQL backend** and a **vanilla JS + Leaflet frontend**.
 
 ---
@@ -179,7 +186,7 @@ CREATE TABLE incident_types (id INT PRIMARY KEY, name VARCHAR(50));
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/your-org/accident-reports.git
+git clone https://github.com/ChadOhman/opensafetymap.git
 cd accident-reports
 ```
 

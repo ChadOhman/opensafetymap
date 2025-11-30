@@ -1,6 +1,6 @@
 # 🚀 Project Setup Guide
 
-This guide explains how to get OpenSafetyMap running locally in just a few steps.
+This guide explains how to get the Edmonton Accident & Near Miss Reporting Platform running locally in just a few steps.
 
 ---
 

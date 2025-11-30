@@ -1,8 +1,11 @@
-# Contributing to OpenSafetyMap
+# Contributing to Edmonton Accident & Near Miss Reporting Platform
+
+[![CI/CD](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml/badge.svg)](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml)
+[![GitHub release](https://img.shields.io/github/v/release/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/releases)
+[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://chadohman.github.io/opensafetymap/)
+
 
 We welcome contributions to improve this project! 🎉
-
-[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://ChadOhman.github.io/opensafetymap/)
 
 ---
 
@@ -85,4 +88,4 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 ---
 
-Thanks for contributing!  
+Thanks for contributing! 🚦  

@@ -3,7 +3,7 @@
 > 🟢 New here? Start with the [Setup Guide](setup.md) to get your environment running quickly.
 
 
-This guide explains the responsibilities and workflows for moderators on OpenSafetyMap.
+This guide explains the responsibilities and workflows for moderators on the Edmonton Accident & Near Miss Reporting Platform.
 
 ---
 

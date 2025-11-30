@@ -1,6 +1,6 @@
 # 🏗️ System Architecture
 
-The OpenSafetyMap is built as a **web-first application** with a modular backend and frontend.
+The Edmonton Accident & Near Miss Reporting Platform is built as a **web-first application** with a modular backend and frontend.
 
 ---
 

@@ -3,7 +3,7 @@
 > 🟢 New here? Start with the [Setup Guide](setup.md) to get your environment running quickly.
 
 
-This guide is for developers who want to contribute to or extend the OpenSafetyMap.
+This guide is for developers who want to contribute to or extend the Edmonton Accident & Near Miss Reporting Platform.
 
 ---
 
@@ -21,7 +21,7 @@ This guide is for developers who want to contribute to or extend the OpenSafetyM
 1. Clone the repository:
 ```bash
 git clone https://github.com/ChadOhman/opensafetymap.git
-cd opensafetymap
+cd accident-reports
 ```
 
 2. Import the database:
@@ -49,7 +49,7 @@ php -S localhost:8000 -t public
 ## 📂 Codebase Structure
 
 ```
-opensafetymap/
+accident-reports/
 ├── api/               # Backend PHP APIs
 │   ├── auth/          # OAuth endpoints
 │   ├── reports/       # Report submission & management
