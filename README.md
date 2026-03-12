@@ -7,8 +7,6 @@ A community-driven platform for reporting and tracking road safety incidents on 
 
 Built with **PHP 8.2 + MySQL 8** backend and a **vanilla JS + Leaflet.js** frontend. No build tools, no bundler.
 
-![System Overview](docs/system_overview.png)
-
 ---
 
 ## Features
@@ -42,19 +40,6 @@ This builds and starts Docker containers: PHP/Apache on **:8080** and MySQL 8 on
 
 Visit **http://localhost:8080**.
 
-### Useful Commands
-
-```bash
-make up          # Build and start containers
-make down        # Stop containers
-make restart     # Rebuild from scratch
-make seed        # Re-load test data
-make reset-db    # Nuke DB volumes and rebuild
-make db-shell    # MySQL shell
-make app-shell   # PHP container shell
-make lint        # PHP syntax check all files
-```
-
 ### MariaDB Alternative
 
 ```bash
@@ -83,54 +68,6 @@ Supports `--db [mysql|mariadb]`, `--web [apache|nginx]`, `--db-name`, `--db-user
 | Storage | Amazon S3 (photo/video uploads) |
 | Geolocation | MaxMind GeoLite2 (IP fallback) |
 | Containers | Docker, Docker Compose |
-
----
-
-## Project Structure
-
-```
-opensafetymap/
-├── api/
-│   ├── auth/          # OAuth endpoints, session, tokens, CSRF, logout
-│   ├── reports/       # List, detail, submit, upload, pending, moderate
-│   ├── comments/      # Submit comments
-│   ├── flags/         # Submit, list, resolve
-│   ├── moderation/    # Audit log, stats
-│   ├── users/         # Profile, settings, reports, list, ban/unban, role
-│   ├── admin/         # Key-value settings
-│   ├── location/      # IP geolocation
-│   └── lookups.php    # All dropdown values
-├── db/
-│   ├── connect.php        # PDO connection + session config
-│   ├── auth_helper.php    # Dual auth, CSRF, CORS, honeypot, role checks
-│   ├── api_response.php   # {success, data} / {success, error, code} envelope
-│   ├── rate_limiter.php   # IP-based rate limiting via DB
-│   ├── env_loader.php     # .env file parser
-│   ├── alias_helper.php   # Random username generator
-│   ├── oauth_config.php   # Provider credentials
-│   └── s3_config.php      # S3 credentials
-├── assets/
-│   ├── css/style.css      # Custom properties, dark/light mode, responsive
-│   └── js/
-│       ├── api.js         # Fetch wrapper, Bearer tokens, CSRF, escapeHTML
-│       ├── auth.js        # Session check, role helpers, OAuth handling
-│       ├── theme.js       # Dark/light/auto cycling
-│       ├── geolocation.js # Browser → IP → cache → world view
-│       ├── map.js         # Main map page logic
-│       ├── report-form.js # Report submission form
-│       ├── moderation.js  # Moderation dashboard
-│       ├── user_profile.js
-│       └── user_directory.js
-├── sql/
-│   ├── schema.sql     # 16 tables + indexes + seed lookup data
-│   └── seed.sql       # Test data (3 users, 8 reports, comments, flags)
-├── docker/
-│   └── Dockerfile
-├── docker-compose.yml
-├── Makefile
-├── .env.example
-└── *.html             # 6 pages: index, report, login, profile, moderation, directory
-```
 
 ---
 
