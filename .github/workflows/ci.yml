@@ -30,7 +30,7 @@ jobs:
       - name: Check SQL syntax
         run: |
           sudo apt-get update && sudo apt-get install -y mysql-client
-          mysql --batch --execute="SOURCE seed.sql" || echo "SQL validation complete (errors shown above if any)"
+          mysql --batch --execute="SOURCE sql/schema.sql" || echo "SQL validation complete (errors shown above if any)"
 
   release:
     name: Create Release
@@ -43,9 +43,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            seed.sql
+            sql/schema.sql
             README.md
-            QUICKSTART.md
             CHANGELOG.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

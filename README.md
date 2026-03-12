@@ -30,7 +30,7 @@ Built with **PHP 8.2 + MySQL 8** backend and a **vanilla JS + Leaflet.js** front
 ## Quick Start
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ChadOhman/opensafetymap/main/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ChadOhman/opensafetymap/main/scripts/setup.sh | bash
 ```
 
 This installs git and Docker if missing, clones the repo, and starts the app. PHP/Apache on **:8080**, MySQL 8 on **:3306**. Schema and seed data load automatically.

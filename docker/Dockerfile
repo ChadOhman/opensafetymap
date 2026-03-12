@@ -11,6 +11,9 @@ RUN echo "upload_max_filesize = 110M" > /usr/local/etc/php/conf.d/uploads.ini \
 WORKDIR /var/www/html
 COPY . /var/www/html
 
+# Set DocumentRoot to public/
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
+
 RUN chown -R www-data:www-data /var/www/html \
   && mkdir -p /var/www/html/uploads/pending \
   && chown www-data:www-data /var/www/html/uploads/pending

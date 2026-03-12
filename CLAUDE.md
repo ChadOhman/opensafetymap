@@ -30,6 +30,22 @@ python tools/a11y_checks.py <file>     # Offline accessibility checks
 
 CI (`.github/workflows/ci.yml`) runs PHP lint and SQL schema validation only. There are no automated test suites.
 
+## Directory Structure
+
+```
+public/              # Apache DocumentRoot (served by Docker)
+  *.html             # All HTML pages
+  assets/css/        # Single stylesheet with page-specific sections
+  assets/js/         # ES6 modules (no build step)
+  api/               # PHP API endpoints organized by feature
+db/                  # PHP helpers (connect, auth, rate limiting, response)
+sql/                 # Schema + seed data
+docker/              # Dockerfile
+scripts/             # Setup and install scripts
+docs/                # MkDocs documentation site
+tools/               # Offline validation scripts
+```
+
 ## Architecture
 
 ### Dual Auth Model
@@ -42,11 +58,11 @@ Two parallel auth mechanisms in `db/auth_helper.php`:
 
 ### API Endpoint Pattern
 
-Every endpoint follows the same structure:
+Every endpoint follows the same structure (paths relative from `public/api/`):
 ```php
-require_once(__DIR__ . '/../../db/connect.php');   // provides $pdo, starts session
-require_once(__DIR__ . '/../../db/auth_helper.php'); // auth + CSRF + CORS
-require_once(__DIR__ . '/../../db/rate_limiter.php'); // IP-based rate limiting
+require_once(__DIR__ . '/../../../db/connect.php');   // provides $pdo, starts session
+require_once(__DIR__ . '/../../../db/auth_helper.php'); // auth + CSRF + CORS
+require_once(__DIR__ . '/../../../db/rate_limiter.php'); // IP-based rate limiting
 
 set_cors_headers();                    // always first
 $user = require_role($pdo, 'moderator'); // or require_active_user($pdo), or get_current_user_from_auth($pdo)
@@ -71,8 +87,9 @@ IP-based via `rate_limits` DB table (not session-based). `rate_limit($pdo, $key,
 
 ### Frontend Module System
 
-ES6 modules with no build step. Shared modules in `assets/js/`:
-- `api.js` — fetch wrapper with Bearer token injection, CSRF handling, `escapeHTML()`
+ES6 modules with no build step. Shared modules in `public/assets/js/`:
+- `api.js` — fetch wrapper with Bearer token injection, CSRF handling, `escapeHTML()`, `postFormData()`
+- `utils.js` — shared UI helpers: `announce()`, `statusBadge()`, `populateSelect()`
 - `auth.js` — session check, role helpers, OAuth result handling
 - `theme.js` — dark/light/auto cycling via CSS custom properties + `data-theme` attribute
 - `geolocation.js` — browser → IP fallback → localStorage cache → world view
@@ -84,7 +101,7 @@ All colors are CSS custom properties in `:root`. Dark mode has two triggers:
 - `[data-theme="dark"]` — explicit user choice
 - `@media (prefers-color-scheme: dark)` with `:root:not([data-theme="light"])` — system auto
 
-Map tiles swap between OSM standard (light) and CartoDB Dark Matter (dark) via `themechange` custom event.
+Map tiles swap between OSM standard (light) and CartoDB Dark Matter (dark) via `themechange` custom event. Page-specific styles are at the end of `style.css` under section headers.
 
 ### PDO Gotcha
 
@@ -95,15 +112,15 @@ Map tiles swap between OSM standard (light) and CartoDB Dark Matter (dark) via `
 - `db/connect.php` → loaded by every API endpoint, provides `$pdo` and starts session
 - `db/auth_helper.php` → requires `api_response.php` internally, provides all auth/CSRF/CORS functions
 - `db/rate_limiter.php` → requires `api_response.php` internally, uses `rate_limits` DB table
-- `api/auth/oauth_helper.php` → requires `auth_helper.php` and `alias_helper.php`, shared by all 4 OAuth endpoints
+- `public/api/auth/oauth_helper.php` → requires `auth_helper.php` and `alias_helper.php`, shared by all 4 OAuth endpoints
 - Schema seed data in `sql/schema.sql` (lookup tables), test data in `sql/seed.sql`
 
 ## Coding Standards
 
 - **PHP:** PSR-12, PDO prepared statements for all queries, helpers in `db/`
 - **JS:** ES6 modules, async/await, `escapeHTML()` on all user content before DOM insertion
-- **CSS:** All colors via custom properties, no hardcoded color values in component styles
-- **HTML:** Skip link, `main#main-content`, `aria-live="polite"` status region on every page
+- **CSS:** All colors via custom properties, no hardcoded color values in component styles. Page-specific styles in `style.css` under section headers, not inline `<style>` blocks.
+- **HTML:** Skip link, `main#main-content`, `aria-live="polite"` status region on every page. CDN scripts pinned to versions with SRI integrity hashes.
 - **Commits:** Imperative mood ("Add feature" not "Added feature")
 
 ## Test Seed Users

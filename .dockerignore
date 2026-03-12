@@ -1,7 +1,12 @@
 .git
 .github
 .lighthouseci
+.superpowers
+.worktrees
 node_modules
+docs
+tools
+scripts
 docker-compose.yml
 *.md
 .env
