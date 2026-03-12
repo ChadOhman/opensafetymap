@@ -23,3 +23,6 @@ tmp/
 
 # Lighthouse CI artifacts
 .lighthouseci/
+
+# Git worktrees
+.worktrees/
