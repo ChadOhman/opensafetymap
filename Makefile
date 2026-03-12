@@ -1,26 +1,31 @@
-# Makefile for Docker shortcuts
-
 up:
-	docker-compose -f docker/docker-compose.yml up --build -d
+	docker compose up --build -d
 
 down:
-	docker-compose -f docker/docker-compose.yml down
+	docker compose down
 
 logs:
-	docker-compose -f docker/docker-compose.yml logs -f
+	docker compose logs -f
 
 ps:
-	docker-compose -f docker/docker-compose.yml ps
+	docker compose ps
 
 restart:
-	docker-compose -f docker/docker-compose.yml down
-	docker-compose -f docker/docker-compose.yml up --build -d
+	docker compose down
+	docker compose up --build -d
 
 db-shell:
-	docker exec -it accident-reports-db mysql -u root -pexample accident_reports
+	docker compose exec db mysql -u root -p$${DB_ROOT_PASSWORD:-rootpass} $${DB_NAME:-accidents}
 
 app-shell:
-	docker exec -it accident-reports-app bash
+	docker compose exec app bash
 
 seed:
-	docker exec -i accident-reports-db mysql -u root -pexample accident_reports < seed.sql
+	docker compose exec -T db mysql -u root -p$${DB_ROOT_PASSWORD:-rootpass} $${DB_NAME:-accidents} < sql/seed.sql
+
+reset-db:
+	docker compose down -v
+	docker compose up --build -d
+
+lint:
+	find . -name '*.php' -not -path './vendor/*' | xargs -I {} php -l {}
