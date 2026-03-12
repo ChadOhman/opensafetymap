@@ -42,7 +42,7 @@ export async function detectLocation() {
     } catch { /* denied or unavailable */ }
 
     try {
-        const res = await fetch('/api/location/detect.php');
+        const res = await fetch('/api/location/ip');
         const json = await res.json();
         if (json.success && json.data.latitude) {
             return { lat: json.data.latitude, lng: json.data.longitude, zoom: 11 };

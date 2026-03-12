@@ -5,7 +5,7 @@
 
 A community-driven platform for reporting and tracking road safety incidents on an interactive map. Anyone can submit a report — with or without an account. Moderators review submissions before they appear publicly.
 
-Built with **PHP 8.2 + MySQL 8** backend and a **vanilla JS + Leaflet.js** frontend. No build tools, no bundler.
+Built with **Node.js 20 + TypeScript 5 + Express** backend, **MySQL 8** database, and a **vanilla JS + Leaflet.js** frontend. No frontend build tools, no bundler.
 
 ---
 
@@ -33,7 +33,7 @@ Built with **PHP 8.2 + MySQL 8** backend and a **vanilla JS + Leaflet.js** front
 curl -fsSL https://raw.githubusercontent.com/ChadOhman/opensafetymap/main/scripts/setup.sh | bash
 ```
 
-This installs git and Docker if missing, clones the repo, and starts the app. PHP/Apache on **:8080**, MySQL 8 on **:3306**. Schema and seed data load automatically.
+This installs git and Docker if missing, clones the repo, and starts the app. Node.js/Express on **:8080**, MySQL 8 on **:3306**. Schema and seed data load automatically.
 
 Visit **http://localhost:8080**.
 
@@ -49,7 +49,7 @@ git clone https://github.com/ChadOhman/opensafetymap.git && cd opensafetymap && 
 
 | Layer | Technology |
 |-------|-----------|
-| Backend | PHP 8.2, MySQL 8, PDO |
+| Backend | Node.js 20, TypeScript 5, Express.js 4, MySQL 8, mysql2 |
 | Frontend | HTML5, CSS3, JavaScript ES6 modules |
 | Maps | Leaflet.js, MarkerCluster, OpenStreetMap, CartoDB |
 | Charts | Chart.js |
@@ -92,48 +92,48 @@ All endpoints return a consistent JSON envelope:
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/lookups.php` | All lookup table values |
-| GET | `/api/reports/list.php?bbox=...` | Reports in bounding box (paginated) |
-| GET | `/api/reports/detail.php?id=...` | Single report with photos, comments |
-| GET | `/api/location/detect.php` | IP-based geolocation |
-| GET | `/api/auth/csrf.php` | Get CSRF token |
-| GET | `/api/users/profile.php?username=...` | Public profile (respects privacy) |
+| GET | `/api/lookups` | All lookup table values |
+| GET | `/api/reports/list?bbox=...` | Reports in bounding box (paginated) |
+| GET | `/api/reports/detail?id=...` | Single report with photos, comments |
+| GET | `/api/location/detect` | IP-based geolocation |
+| GET | `/api/auth/csrf` | Get CSRF token |
+| GET | `/api/users/profile?username=...` | Public profile (respects privacy) |
 
 ### Authenticated Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/reports/submit.php` | Submit report (auth or anonymous) |
-| POST | `/api/reports/upload.php` | Upload photo/video |
-| POST | `/api/comments/submit.php` | Add comment |
-| POST | `/api/flags/submit.php` | Flag content |
-| GET | `/api/auth/session.php` | Current user info |
-| GET | `/api/auth/tokens.php` | List active tokens |
-| DELETE | `/api/auth/tokens.php?id=...` | Revoke token |
-| POST | `/api/auth/logout.php` | Logout |
-| PUT | `/api/users/settings.php` | Update own settings |
-| GET | `/api/users/reports.php` | Own reports |
+| POST | `/api/reports/submit` | Submit report (auth or anonymous) |
+| POST | `/api/reports/upload` | Upload photo/video |
+| POST | `/api/comments/submit` | Add comment |
+| POST | `/api/flags/submit` | Flag content |
+| GET | `/api/auth/session` | Current user info |
+| GET | `/api/auth/tokens` | List active tokens |
+| DELETE | `/api/auth/tokens?id=...` | Revoke token |
+| POST | `/api/auth/logout` | Logout |
+| PUT | `/api/users/settings` | Update own settings |
+| GET | `/api/users/reports` | Own reports |
 
 ### Moderator Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/reports/pending.php` | Pending reports queue |
-| POST | `/api/reports/moderate.php` | Approve/reject/resolve report |
-| GET | `/api/flags/list.php` | Flagged content |
-| POST | `/api/flags/resolve.php` | Dismiss/remove flagged item |
-| GET | `/api/moderation/log.php` | Filterable audit log |
-| GET | `/api/moderation/stats.php` | Moderation analytics |
+| GET | `/api/reports/pending` | Pending reports queue |
+| POST | `/api/reports/moderate` | Approve/reject/resolve report |
+| GET | `/api/flags/list` | Flagged content |
+| POST | `/api/flags/resolve` | Dismiss/remove flagged item |
+| GET | `/api/moderation/log` | Filterable audit log |
+| GET | `/api/moderation/stats` | Moderation analytics |
 
 ### Admin Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/users/list.php` | User directory (search/filter) |
-| POST | `/api/users/ban.php` | Ban user |
-| POST | `/api/users/unban.php` | Unban user |
-| POST | `/api/users/role.php` | Change user role |
-| GET/PUT | `/api/admin/settings.php` | App settings |
+| GET | `/api/users/list` | User directory (search/filter) |
+| POST | `/api/users/ban` | Ban user |
+| POST | `/api/users/unban` | Unban user |
+| POST | `/api/users/role` | Change user role |
+| GET/PUT | `/api/admin/settings` | App settings |
 
 ---
 
@@ -142,7 +142,7 @@ All endpoints return a consistent JSON envelope:
 Copy `.env.example` to `.env` and fill in:
 
 - **Database**: `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`
-- **App**: `APP_URL`, `APP_ENV` (development/production), `CORS_ORIGIN`
+- **App**: `APP_URL`, `APP_ENV` (development/production), `CORS_ORIGIN`, `SESSION_SECRET`
 - **OAuth**: Client ID + secret for each provider (Google, Apple, Mastodon, Bluesky)
 - **S3**: `S3_BUCKET`, `S3_KEY`, `S3_SECRET`, `S3_REGION`
 - **Geolocation**: `MAXMIND_DB_PATH` (optional, for IP-based location fallback)
@@ -151,9 +151,9 @@ Copy `.env.example` to `.env` and fill in:
 
 ## CI/CD
 
-- **PHP Lint**: Checks all `.php` files for syntax errors on every push and PR
+- **TypeScript Check**: `tsc --noEmit` on every push and PR
+- **Tests**: Vitest test suite
 - **SQL Validation**: Verifies schema syntax
-- **Lighthouse CI**: Audits pages for performance, accessibility, and SEO (static HTML only)
 
 ---
 

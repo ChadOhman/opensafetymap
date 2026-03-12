@@ -37,7 +37,7 @@ async function loadUsers(page) {
   if (st)     params.set('status', st);
 
   try {
-    const data = await getJSON(`/api/users/list.php?${params.toString()}`);
+    const data = await getJSON(`/api/users/list?${params.toString()}`);
     const users = data.users || data || [];
     const total = data.total || users.length;
 
@@ -133,7 +133,7 @@ function renderPagination(total) {
 /* ------------------------------------------------------------------ */
 async function changeRole(userId, newRole) {
   try {
-    await postJSON('/api/users/role.php', { user_id: userId, role: newRole });
+    await postJSON('/api/users/role', { user_id: userId, role: newRole });
     announce(`User ${userId} role changed to ${newRole}`);
     loadUsers(currentPage);
   } catch (err) {
@@ -144,7 +144,7 @@ async function changeRole(userId, newRole) {
 
 async function banUser(userId) {
   try {
-    await postJSON('/api/users/ban.php', { user_id: userId });
+    await postJSON('/api/users/ban', { user_id: userId });
     announce(`User ${userId} banned`);
     loadUsers(currentPage);
   } catch (err) {
@@ -155,7 +155,7 @@ async function banUser(userId) {
 
 async function unbanUser(userId) {
   try {
-    await postJSON('/api/users/unban.php', { user_id: userId });
+    await postJSON('/api/users/unban', { user_id: userId });
     announce(`User ${userId} unbanned`);
     loadUsers(currentPage);
   } catch (err) {

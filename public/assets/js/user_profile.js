@@ -46,7 +46,7 @@ function renderProfile(user) {
 async function loadReports(page) {
   currentPage = page;
   try {
-    const data = await getJSON(`/api/reports/mine.php?page=${page}&per_page=${perPage}`);
+    const data = await getJSON(`/api/users/reports?page=${page}&per_page=${perPage}`);
     const reports = data.reports || data || [];
     const total = data.total || reports.length;
 
@@ -104,7 +104,7 @@ function renderPagination(total) {
 /* ------------------------------------------------------------------ */
 async function loadSessions() {
   try {
-    const data = await getJSON('/api/auth/tokens.php');
+    const data = await getJSON('/api/auth/tokens');
     const tokens = data.tokens || data || [];
     sessionsList.innerHTML = '';
 
@@ -133,7 +133,7 @@ async function loadSessions() {
         revokeBtn.textContent = 'Revoke';
         revokeBtn.addEventListener('click', async () => {
           try {
-            await deleteJSON(`/api/auth/tokens.php?id=${encodeURIComponent(t.id)}`);
+            await deleteJSON(`/api/auth/tokens?id=${encodeURIComponent(t.id)}`);
             await loadSessions();
             announce('Session revoked');
           } catch (err) {
@@ -157,7 +157,7 @@ async function handleSettings(e) {
   e.preventDefault();
   settingsFeedback.hidden = true;
   try {
-    await putJSON('/api/users/settings.php', {
+    await putJSON('/api/users/settings', {
       username: settingsUsername.value.trim(),
       privacy: settingsPrivacy.value
     });

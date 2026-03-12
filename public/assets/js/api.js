@@ -17,7 +17,7 @@ export function getAuthToken() {
 async function ensureCsrfToken() {
     if (_csrfToken) return _csrfToken;
     try {
-        const res = await fetch('/api/auth/csrf.php');
+        const res = await fetch('/api/auth/csrf');
         const json = await res.json();
         if (json.success && json.data.csrf_token) {
             _csrfToken = json.data.csrf_token;

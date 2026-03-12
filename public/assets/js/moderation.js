@@ -51,7 +51,7 @@ async function loadPending() {
   const empty = document.getElementById('pendingEmpty');
 
   try {
-    const data = await getJSON('/api/reports/list.php?status=pending&per_page=100');
+    const data = await getJSON('/api/reports/list?status=pending&per_page=100');
     const reports = data.reports || data || [];
 
     list.innerHTML = '';
@@ -97,7 +97,7 @@ async function loadPending() {
 
 async function moderateReport(id, action, notes) {
   try {
-    await postJSON('/api/reports/moderate.php', { report_id: id, action, notes });
+    await postJSON('/api/reports/moderate', { report_id: id, action, notes });
     announce(`Report ${id} ${action}d`);
     loaded.pending = false;
     loadPending();
@@ -116,7 +116,7 @@ async function loadFlagged() {
   const empty = document.getElementById('flaggedEmpty');
 
   try {
-    const data = await getJSON('/api/flags/list.php');
+    const data = await getJSON('/api/flags/list');
     const flags = data.flags || data || [];
 
     list.innerHTML = '';
@@ -158,7 +158,7 @@ async function loadFlagged() {
 
 async function resolveFlag(id, action, notes) {
   try {
-    await postJSON('/api/flags/resolve.php', { flag_id: id, action, notes });
+    await postJSON('/api/flags/resolve', { flag_id: id, action, notes });
     announce(`Flag ${id} ${action}ed`);
     loaded.flagged = false;
     loadFlagged();
@@ -189,7 +189,7 @@ async function loadLog() {
   params.set('per_page', logPerPage);
 
   try {
-    const data = await getJSON(`/api/moderation/log.php?${params.toString()}`);
+    const data = await getJSON(`/api/moderation/log?${params.toString()}`);
     const logs = data.logs || data || [];
     const total = data.total || logs.length;
 
@@ -248,7 +248,7 @@ async function loadAnalytics() {
   const grid = document.getElementById('statsGrid');
 
   try {
-    const data = await getJSON('/api/admin/moderation_stats.php');
+    const data = await getJSON('/api/moderation/stats');
 
     grid.innerHTML = [
       { label: 'Total Reports', value: data.total || 0 },
@@ -317,7 +317,7 @@ async function loadAnalytics() {
 async function loadAdminSettings() {
   const editor = document.getElementById('settingsEditor');
   try {
-    const data = await getJSON('/api/admin/settings.php');
+    const data = await getJSON('/api/admin/settings');
     const settings = data.settings || data || {};
     editor.innerHTML = '';
 
@@ -343,7 +343,7 @@ async function saveAdminSettings() {
   inputs.forEach(inp => { payload[inp.name] = inp.value; });
 
   try {
-    await putJSON('/api/admin/settings.php', payload);
+    await putJSON('/api/admin/settings', payload);
     adminFeedback.textContent = 'Settings saved.';
     adminFeedback.className = 'alert alert-success';
     adminFeedback.hidden = false;

@@ -48,7 +48,7 @@ function hideFeedback() {
 /* ------------------------------------------------------------------ */
 async function populateLookups() {
   try {
-    const lookups = await getJSON('/api/lookups.php');
+    const lookups = await getJSON('/api/lookups');
     populateSelect('reporterMode', lookups.reporter_modes || [], 'id', 'name');
     populateSelect('incidentType', lookups.incident_types || [], 'id', 'name');
     populateOtherParties(lookups.other_parties || []);
@@ -123,7 +123,7 @@ async function handlePhotoSelect(files) {
       fd.append('file', file);
       fd.append('type', 'photo');
 
-      const data = await postFormData('/api/reports/upload.php', fd);
+      const data = await postFormData('/api/reports/upload', fd);
       if (data) {
         uploadedPhotos.push({ url: data.url, upload_token: data.upload_token });
         const img = document.createElement('img');
@@ -146,7 +146,7 @@ async function handleVideoSelect(file) {
     fd.append('file', file);
     fd.append('type', 'video');
 
-    const data = await postFormData('/api/reports/upload.php', fd);
+    const data = await postFormData('/api/reports/upload', fd);
     if (data) {
       uploadedVideo = { url: data.url, upload_token: data.upload_token };
       videoPreview.textContent = `Video uploaded: ${escapeHTML(file.name)}`;
@@ -205,7 +205,7 @@ async function handleSubmit(e) {
   announce('Submitting report...');
 
   try {
-    await postJSON('/api/reports/submit.php', payload);
+    await postJSON('/api/reports/submit', payload);
     showFeedback('Report submitted successfully! Thank you.', 'success');
     announce('Report submitted successfully');
     reportForm.reset();

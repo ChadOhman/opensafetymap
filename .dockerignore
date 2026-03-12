@@ -4,6 +4,7 @@
 .superpowers
 .worktrees
 node_modules
+dist
 docs
 tools
 scripts

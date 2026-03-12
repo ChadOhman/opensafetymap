@@ -4,7 +4,7 @@ let _currentUser = null;
 
 export async function checkAuth() {
     try {
-        _currentUser = await getJSON('/api/auth/session.php');
+        _currentUser = await getJSON('/api/auth/session');
         return _currentUser;
     } catch {
         _currentUser = null;
@@ -23,7 +23,7 @@ export function isRole(role) {
 
 export async function logout() {
     try {
-        await fetch('/api/auth/logout.php', {
+        await fetch('/api/auth/logout', {
             method: 'POST',
             headers: getAuthToken()
                 ? { 'Authorization': `Bearer ${getAuthToken()}` }

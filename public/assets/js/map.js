@@ -81,7 +81,7 @@ function getFilterParams() {
 
 async function populateFilters() {
   try {
-    const lookups = await getJSON('/api/lookups.php');
+    const lookups = await getJSON('/api/lookups');
     populateSelect('filterMode', lookups.reporter_modes || [], 'id', 'name');
     populateSelect('filterType', lookups.incident_types || [], 'id', 'name');
     populateSelect('filterSeverity', lookups.severity_levels || [], 'id', 'name');
@@ -106,7 +106,7 @@ async function loadMarkers() {
 
   announce('Loading reports...');
   try {
-    const data = await getJSON(`/api/reports/list.php?${filterParams.toString()}`);
+    const data = await getJSON(`/api/reports/list?${filterParams.toString()}`);
     clusterGroup.clearLayers();
 
     const reports = data.reports || data || [];
@@ -154,7 +154,7 @@ const debouncedLoad = debounce(loadMarkers, 300);
 /* ------------------------------------------------------------------ */
 async function openDetail(id) {
   try {
-    const report = await getJSON(`/api/reports/detail.php?id=${encodeURIComponent(id)}`);
+    const report = await getJSON(`/api/reports/detail?id=${encodeURIComponent(id)}`);
     renderDetail(report);
     detailPanel.hidden = false;
     detailPanel.classList.add('open');
@@ -243,7 +243,7 @@ async function submitComment(reportId, form) {
   if (payload.website) return; // honeypot triggered
 
   try {
-    await postJSON('/api/reports/comment.php', payload);
+    await postJSON('/api/comments/add', payload);
     openDetail(reportId); // refresh
   } catch (err) {
     console.error('Comment failed', err);
