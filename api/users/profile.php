@@ -1,41 +1,34 @@
 <?php
-require_once("../../db/connect.php");
-require_once("../../db/api_response.php");
+require_once(__DIR__ . '/../../db/connect.php');
+require_once(__DIR__ . '/../../db/auth_helper.php');
 
-$id = $_GET['id'] ?? $_SESSION['user_id'] ?? null;
-if (!$id) respond_error("No user specified");
+set_cors_headers();
 
-$stmt = $pdo->prepare("SELECT id, username, role, status, privacy FROM users WHERE id=?");
-$stmt->execute([$id]);
-$user = $stmt->fetch();
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') respond_error("Method not allowed", 405);
 
-if (!$user) respond_error("User not found", 404);
+$username = $_GET['username'] ?? '';
+if (!$username) respond_error("username required", 400);
 
-// Check privacy settings
-$isOwner = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user['id'];
-$isAdmin = ($_SESSION['role'] ?? '') === 'admin';
-$canSeeDetails = $isOwner || $isAdmin ||
-    ($user['privacy'] === 'public') ||
-    ($user['privacy'] === 'logged-in' && isset($_SESSION['user_id']));
+$stmt = $pdo->prepare("SELECT id, username, name, role, privacy, status, created_at FROM users WHERE username = ?");
+$stmt->execute([$username]);
+$profile = $stmt->fetch();
+if (!$profile || $profile['status'] === 'banned') respond_error("User not found", 404);
 
-if (!$canSeeDetails) {
-    respond_success([
-        "user" => ["id" => $user['id'], "username" => $user['username'], "role" => $user['role']],
-        "reports" => [],
-        "comments" => []
-    ]);
+$viewer = get_current_user_from_auth($pdo);
+$is_owner = $viewer && $viewer['id'] == $profile['id'];
+$is_admin = $viewer && ($viewer['role'] === 'admin' || $viewer['role'] === 'moderator');
+
+// Respect privacy settings
+if ($profile['privacy'] === 'private' && !$is_owner && !$is_admin) {
+    respond_success(['username' => $profile['username'], 'role' => $profile['role']]);
+}
+if ($profile['privacy'] === 'logged-in' && !$viewer) {
+    respond_success(['username' => $profile['username'], 'role' => $profile['role']]);
 }
 
-// Reports
-$reports = $pdo->prepare("SELECT id, description, status, timestamp FROM reports WHERE user_id=? ORDER BY timestamp DESC");
-$reports->execute([$id]);
+// Full profile - add report count
+$count_stmt = $pdo->prepare("SELECT COUNT(*) FROM reports WHERE user_id = ? AND status = 'approved'");
+$count_stmt->execute([$profile['id']]);
+$profile['report_count'] = (int)$count_stmt->fetchColumn();
 
-// Comments
-$comments = $pdo->prepare("SELECT id, content, timestamp FROM comments WHERE user_id=? ORDER BY timestamp DESC");
-$comments->execute([$id]);
-
-respond_success([
-    "user" => $user,
-    "reports" => $reports->fetchAll(),
-    "comments" => $comments->fetchAll()
-]);
+respond_success($profile);
