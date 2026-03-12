@@ -4,68 +4,107 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Edmonton Accident & Near Miss Reporting Platform — a community-driven web app for reporting and moderating traffic incidents on an interactive map. PHP 8.2+ backend with vanilla JavaScript ES6 module frontend, MySQL 8 database, Leaflet.js map with marker clustering.
+Open Safety Map — a public, location-agnostic road safety incident reporting platform. Users report traffic incidents on an interactive map with optional anonymous submission. PHP 8.2 backend, MySQL 8 database, vanilla JS ES6 module frontend with Leaflet.js.
 
 ## Development Setup
 
 ```bash
-# Docker (recommended)
-make up          # Build and start containers (app on :8080, db on :3306)
-make seed        # Load test data
+make up          # Build and start Docker containers (app :8080, db :3306)
+make seed        # Load test data into running DB
+make reset-db    # Nuke volumes and rebuild from scratch
 make down        # Stop containers
-make db-shell    # MySQL shell access
+make db-shell    # MySQL shell
 make app-shell   # PHP container shell
-
-# Alternative: PHP built-in server
-php -S localhost:8000 -t public
+make lint        # PHP syntax check all files
 ```
 
-## Validation Commands
+Copy `.env.example` to `.env` for local config. Docker Compose passes env vars to the app container automatically.
+
+## Validation
 
 ```bash
-# PHP lint (CI runs this)
-php -l api/**/*.php db/*.php
-
-# HTML structure validation
-python tools/html_checks.py <file>
-
-# Accessibility checks (offline Pa11y alternative)
-python tools/a11y_checks.py <file>
+make lint                              # PHP syntax (also runs in CI)
+python tools/html_checks.py <file>     # HTML structure validation
+python tools/a11y_checks.py <file>     # Offline accessibility checks
 ```
 
-There are no automated test suites. CI (``.github/workflows/ci.yml``) runs PHP syntax checking and SQL schema validation only.
+CI (`.github/workflows/ci.yml`) runs PHP lint and SQL schema validation only. There are no automated test suites.
 
 ## Architecture
 
-**Backend:** PHP API endpoints in `api/` using PDO prepared statements. Shared helpers in `db/` (connect.php for DB+session, auth_helper.php for role checks, api_response.php for unified JSON responses, alias_helper.php for random username generation).
+### Dual Auth Model
 
-**Frontend:** Static HTML pages (`index.html`, `login.html`, `moderation_dashboard.html`, `user_profile.html`, `user_directory.html`) with ES6 modules in `assets/js/`. `api.js` is the centralized fetch wrapper. No build step or bundler.
+Two parallel auth mechanisms in `db/auth_helper.php`:
+1. **Session cookies** (web browser) — standard PHP sessions with CSRF protection via `require_csrf()`
+2. **Bearer tokens** (mobile/API) — opaque tokens stored in `auth_tokens` table, CSRF exempt
 
-**Database:** Schema in `sql/schema.sql`. Lookup tables for categories, severity_levels, incident_types. Core tables: users, reports, comments, flags, moderation_log, settings. Seed data in `sql/seed.sql`.
+`get_current_user_from_auth($pdo)` checks Bearer header first, then session. All API endpoints accept either. The auth method is tracked in `$GLOBALS['_auth_method']` so CSRF can be skipped for token auth.
 
-**Auth:** OAuth 2.0 via Google, Apple, Mastodon, BlueSky. Providers configured in `db/oauth_config.php`, endpoints in `api/auth/`.
+### API Endpoint Pattern
 
-**Roles:** Three-tier (user/moderator/admin). Role checks enforced in `db/auth_helper.php`. Moderation actions logged immutably to `moderation_log`.
+Every endpoint follows the same structure:
+```php
+require_once(__DIR__ . '/../../db/connect.php');   // provides $pdo, starts session
+require_once(__DIR__ . '/../../db/auth_helper.php'); // auth + CSRF + CORS
+require_once(__DIR__ . '/../../db/rate_limiter.php'); // IP-based rate limiting
+
+set_cors_headers();                    // always first
+$user = require_role($pdo, 'moderator'); // or require_active_user($pdo), or get_current_user_from_auth($pdo)
+require_csrf();                        // on POST/PUT/DELETE (skipped for token auth)
+rate_limit($pdo, 'key', $max, $window);
+
+// ... endpoint logic ...
+
+respond_success($data);   // {success: true, data: ...}
+respond_error($msg, 400); // {success: false, error: ..., code: ...}
+```
+
+Response envelope is always `{success, data}` or `{success, error, code}`. Both helpers call `exit`.
+
+### Anonymous Submissions
+
+Reports, comments, and flags accept anonymous submission (no auth required). Anonymous endpoints use `check_honeypot()` for spam protection instead of CSRF. Anonymous reports require `reporter_email` or `reporter_phone`.
+
+### Rate Limiting
+
+IP-based via `rate_limits` DB table (not session-based). `rate_limit($pdo, $key, $max, $window_seconds)` with probabilistic pruning of expired entries. The `public_read` key gets 2.5x multiplier for authenticated users.
+
+### Frontend Module System
+
+ES6 modules with no build step. Shared modules in `assets/js/`:
+- `api.js` — fetch wrapper with Bearer token injection, CSRF handling, `escapeHTML()`
+- `auth.js` — session check, role helpers, OAuth result handling
+- `theme.js` — dark/light/auto cycling via CSS custom properties + `data-theme` attribute
+- `geolocation.js` — browser → IP fallback → localStorage cache → world view
+- Page-specific modules: `map.js`, `report-form.js`, `moderation.js`, `user_profile.js`, `user_directory.js`
+
+### CSS Theming
+
+All colors are CSS custom properties in `:root`. Dark mode has two triggers:
+- `[data-theme="dark"]` — explicit user choice
+- `@media (prefers-color-scheme: dark)` with `:root:not([data-theme="light"])` — system auto
+
+Map tiles swap between OSM standard (light) and CartoDB Dark Matter (dark) via `themechange` custom event.
+
+### PDO Gotcha
+
+`LIMIT` and `OFFSET` values must be interpolated as cast integers, not bound via `execute()`. PDO binds all `execute()` params as strings, which causes SQL errors with `LIMIT ?`.
+
+## Key Relationships
+
+- `db/connect.php` → loaded by every API endpoint, provides `$pdo` and starts session
+- `db/auth_helper.php` → requires `api_response.php` internally, provides all auth/CSRF/CORS functions
+- `db/rate_limiter.php` → requires `api_response.php` internally, uses `rate_limits` DB table
+- `api/auth/oauth_helper.php` → requires `auth_helper.php` and `alias_helper.php`, shared by all 4 OAuth endpoints
+- Schema seed data in `sql/schema.sql` (lookup tables), test data in `sql/seed.sql`
 
 ## Coding Standards
 
-- **PHP:** PSR-12 style, PDO prepared statements for all queries, shared helpers in `db/`
-- **JavaScript:** ES6 modules, async/await, one module per feature file in `assets/js/`
-- **CSS:** Shared `assets/css/style.css`, utility classes, no inline styles or scripts
+- **PHP:** PSR-12, PDO prepared statements for all queries, helpers in `db/`
+- **JS:** ES6 modules, async/await, `escapeHTML()` on all user content before DOM insertion
+- **CSS:** All colors via custom properties, no hardcoded color values in component styles
+- **HTML:** Skip link, `main#main-content`, `aria-live="polite"` status region on every page
 - **Commits:** Imperative mood ("Add feature" not "Added feature")
-
-## Agent Guidelines (from AGENTS.md)
-
-- Prioritize accessibility and mobile-friendliness
-- Keep styling in CSS files, scripting in JS files — no inline
-- Run `python tools/html_checks.py` and `python tools/a11y_checks.py` on modified HTML files
-- Run Linkinator only when links change
-- Document exact validation commands in PR summaries
-- Update README.md/docs when workflows or contributor steps change
-
-## Environment Configuration
-
-Copy `.env.example` for DB credentials, S3 config, and OAuth provider secrets. Never commit `.env` files.
 
 ## Test Seed Users
 
