@@ -1,10 +1,14 @@
 <?php
-$dbHost = getenv('DB_HOST') ?: 'localhost';
-$dbName = getenv('DB_NAME') ?: 'accidents';
+require_once(__DIR__ . '/env_loader.php');
+load_env(__DIR__ . '/../.env');
+
+$dsn = sprintf(
+    "mysql:host=%s;dbname=%s;charset=utf8mb4",
+    getenv('DB_HOST') ?: 'localhost',
+    getenv('DB_NAME') ?: 'accidents'
+);
 $user = getenv('DB_USER') ?: 'dbuser';
 $pass = getenv('DB_PASS') ?: 'dbpass';
-
-$dsn = "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4";
 
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -14,7 +18,8 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (Exception $e) {
-    die("Database connection failed: " . $e->getMessage());
+    error_log("Database connection failed: " . $e->getMessage());
+    die("Database connection failed. Please try again later.");
 }
 
 session_start();

@@ -20,21 +20,54 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === "POST") {
     require_active_user();
+    require_csrf();
 
     $userId = $_SESSION['user_id'];
-    $category = $_POST['category'];
-    $description = $_POST['description'];
-    $latitude = $_POST['latitude'];
-    $longitude = $_POST['longitude'];
-    $severity = $_POST['severity'];
-    $incident_type = $_POST['incident_type'];
+    $category_id = filter_var($_POST['category_id'] ?? null, FILTER_VALIDATE_INT);
+    $description = trim($_POST['description'] ?? '');
+    $latitude = filter_var($_POST['latitude'] ?? null, FILTER_VALIDATE_FLOAT);
+    $longitude = filter_var($_POST['longitude'] ?? null, FILTER_VALIDATE_FLOAT);
+    $severity_id = filter_var($_POST['severity_id'] ?? null, FILTER_VALIDATE_INT);
+    $incident_type_id = filter_var($_POST['incident_type_id'] ?? null, FILTER_VALIDATE_INT);
+
+    if (!$category_id || !$severity_id || !$incident_type_id) {
+        http_response_code(400);
+        echo json_encode(["error" => "Missing required fields"]);
+        exit;
+    }
+    if ($description === '' || mb_strlen($description) > 2000) {
+        http_response_code(400);
+        echo json_encode(["error" => "Description is required and must be under 2000 characters"]);
+        exit;
+    }
 
     $photo_url = null;
 
     // Handle photo upload if provided
     if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
+        $allowed_types = ['image/jpeg', 'image/png', 'image/webp'];
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $_FILES['photo']['tmp_name']);
+        finfo_close($finfo);
+
+        if (!in_array($mime, $allowed_types)) {
+            http_response_code(400);
+            echo json_encode(["error" => "Invalid file type. Allowed: JPEG, PNG, WebP"]);
+            exit;
+        }
+        if ($_FILES['photo']['size'] > 5242880) {
+            http_response_code(400);
+            echo json_encode(["error" => "File too large. Maximum 5MB"]);
+            exit;
+        }
+
+        $ext = match($mime) {
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+        };
+        $fileName = uniqid("report_") . "." . $ext;
         $fileTmp = $_FILES['photo']['tmp_name'];
-        $fileName = uniqid("report_") . "_" . basename($_FILES['photo']['name']);
 
         try {
             $result = $s3->putObject([
@@ -46,22 +79,23 @@ if ($method === "POST") {
             $photo_url = $result['ObjectURL'];
         } catch (Exception $e) {
             http_response_code(500);
-            echo json_encode(["error" => "Failed to upload photo: " . $e->getMessage()]);
+            echo json_encode(["error" => "Failed to upload photo"]);
             exit;
         }
     }
 
     $stmt = $pdo->prepare("
-        INSERT INTO reports (user_id, category, description, latitude, longitude, severity, incident_type, photo_url)
+        INSERT INTO reports (user_id, category_id, severity_id, incident_type_id, description, latitude, longitude, photo_url)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ");
-    $stmt->execute([$userId, $category, $description, $latitude, $longitude, $severity, $incident_type, $photo_url]);
+    $stmt->execute([$userId, $category_id, $severity_id, $incident_type_id, $description, $latitude, $longitude, $photo_url]);
 
     echo json_encode(["status" => "success", "id" => $pdo->lastInsertId()]);
 }
 
 elseif ($method === "PUT") {
     require_active_user();
+    require_csrf();
     parse_str(file_get_contents("php://input"), $data);
 
     $id = $data['id'];
@@ -71,15 +105,15 @@ elseif ($method === "PUT") {
 
     if ($_SESSION['role'] === 'admin' || $_SESSION['user_id'] == $report['user_id']) {
         $stmt = $pdo->prepare("
-            UPDATE reports SET category=?, description=?, latitude=?, longitude=?, severity=?, incident_type=? WHERE id=?
+            UPDATE reports SET category_id=?, severity_id=?, incident_type_id=?, description=?, latitude=?, longitude=? WHERE id=?
         ");
         $stmt->execute([
-            $data['category'],
+            $data['category_id'],
+            $data['severity_id'],
+            $data['incident_type_id'],
             $data['description'],
             $data['latitude'],
             $data['longitude'],
-            $data['severity'],
-            $data['incident_type'],
             $id
         ]);
         echo json_encode(["status" => "updated"]);
@@ -91,6 +125,7 @@ elseif ($method === "PUT") {
 
 elseif ($method === "DELETE") {
     require_active_user();
+    require_csrf();
     parse_str(file_get_contents("php://input"), $data);
 
     $id = $data['id'];

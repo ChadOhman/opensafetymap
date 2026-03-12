@@ -11,6 +11,21 @@ $user = $stmt->fetch();
 
 if (!$user) respond_error("User not found", 404);
 
+// Check privacy settings
+$isOwner = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user['id'];
+$isAdmin = ($_SESSION['role'] ?? '') === 'admin';
+$canSeeDetails = $isOwner || $isAdmin ||
+    ($user['privacy'] === 'public') ||
+    ($user['privacy'] === 'logged-in' && isset($_SESSION['user_id']));
+
+if (!$canSeeDetails) {
+    respond_success([
+        "user" => ["id" => $user['id'], "username" => $user['username'], "role" => $user['role']],
+        "reports" => [],
+        "comments" => []
+    ]);
+}
+
 // Reports
 $reports = $pdo->prepare("SELECT id, description, status, timestamp FROM reports WHERE user_id=? ORDER BY timestamp DESC");
 $reports->execute([$id]);

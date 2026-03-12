@@ -4,6 +4,7 @@ require_once("../../db/api_response.php");
 require_once("../../db/auth_helper.php");
 
 require_role("admin");
+require_csrf();
 
 $data = json_decode(file_get_contents("php://input"), true);
 if (!isset($data['user_id'])) respond_error("Missing user_id");

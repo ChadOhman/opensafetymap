@@ -19,12 +19,16 @@ function generate_random_username($pdo) {
         "moose","elk","buffalo","stag","antelope","zebra","giraffe","camel","ferret","badger"
     ];
 
+    $attempts = 0;
     do {
         $username = ucfirst($adjectives1[array_rand($adjectives1)]) . " " .
                     ucfirst($adjectives2[array_rand($adjectives2)]) . " " .
                     ucfirst($nouns[array_rand($nouns)]);
 
-        // ensure uniqueness
+        if (++$attempts > 100) {
+            $username .= '_' . random_int(1000, 9999);
+        }
+
         $stmt = $pdo->prepare("SELECT id FROM users WHERE username=?");
         $stmt->execute([$username]);
     } while ($stmt->fetch());

@@ -6,6 +6,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === "POST") {
     require_active_user();
+    require_csrf();
 
     $data = json_decode(file_get_contents("php://input"), true);
     $stmt = $pdo->prepare("INSERT INTO comments (report_id, user_id, content) VALUES (?, ?, ?)");
@@ -15,6 +16,7 @@ if ($method === "POST") {
 
 elseif ($method === "DELETE") {
     require_active_user();
+    require_csrf();
 
     parse_str(file_get_contents("php://input"), $data);
     $id = $data['id'];
@@ -22,6 +24,12 @@ elseif ($method === "DELETE") {
     $stmt = $pdo->prepare("SELECT user_id FROM comments WHERE id=?");
     $stmt->execute([$id]);
     $comment = $stmt->fetch();
+
+    if (!$comment) {
+        http_response_code(404);
+        echo json_encode(["error" => "Comment not found"]);
+        exit;
+    }
 
     if ($_SESSION['role'] !== 'user' || $_SESSION['user_id'] == $comment['user_id']) {
         $pdo->prepare("DELETE FROM comments WHERE id=?")->execute([$id]);
