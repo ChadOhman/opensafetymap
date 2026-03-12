@@ -67,5 +67,5 @@ $stmt->execute([
 ]);
 
 respond_success([
-    'flag_id' => (int)$pdo->lastInsertId()
+    'id' => (int)$pdo->lastInsertId()
 ]);

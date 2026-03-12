@@ -18,10 +18,15 @@ if (count($parts) !== 4) {
     respond_error("bbox parameter required (lat1,lng1,lat2,lng2)");
 }
 
-$lat1 = (float)$parts[0];
-$lng1 = (float)$parts[1];
-$lat2 = (float)$parts[2];
-$lng2 = (float)$parts[3];
+$lat1_raw = (float)$parts[0];
+$lng1_raw = (float)$parts[1];
+$lat2_raw = (float)$parts[2];
+$lng2_raw = (float)$parts[3];
+
+$lat1 = min($lat1_raw, $lat2_raw);
+$lat2 = max($lat1_raw, $lat2_raw);
+$lng1 = min($lng1_raw, $lng2_raw);
+$lng2 = max($lng1_raw, $lng2_raw);
 
 if ($lat1 < -90 || $lat1 > 90 || $lat2 < -90 || $lat2 > 90) {
     respond_error("Invalid latitude in bbox");
@@ -69,11 +74,11 @@ if (!empty($_GET['severity'])) {
     $params[':severity'] = (int)$_GET['severity'];
 }
 if (!empty($_GET['date_from'])) {
-    $conditions[] = "r.created_at >= :date_from";
+    $conditions[] = "r.incident_date >= :date_from";
     $params[':date_from'] = $_GET['date_from'];
 }
 if (!empty($_GET['date_to'])) {
-    $conditions[] = "r.created_at <= :date_to";
+    $conditions[] = "r.incident_date <= :date_to";
     $params[':date_to'] = $_GET['date_to'];
 }
 
@@ -99,11 +104,11 @@ $total = (int)$count_stmt->fetchColumn();
 
 // Fetch reports
 $sql = "SELECT r.id, r.description, r.latitude, r.longitude, r.incident_date, r.created_at,
-               r.status, r.video_url,
+               r.resolved_at, r.status, r.video_url,
                rm.name AS reporter_mode,
                it.name AS incident_type,
                sl.name AS severity,
-               u.username,
+               u.username AS reporter_username,
                (SELECT COUNT(*) FROM report_photos rp WHERE rp.report_id = r.id) AS photo_count,
                (SELECT COUNT(*) FROM comments c WHERE c.report_id = r.id AND c.status = 'approved') AS comment_count
         FROM reports r

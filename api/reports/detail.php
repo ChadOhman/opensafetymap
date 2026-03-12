@@ -24,11 +24,11 @@ $status_clause = $is_mod ? "" : "AND r.status = 'approved'";
 
 // Fetch report — explicit columns, NO reporter_email or reporter_phone
 $sql = "SELECT r.id, r.description, r.latitude, r.longitude, r.incident_date,
-               r.created_at, r.status, r.video_url,
+               r.created_at, r.resolved_at, r.status, r.video_url,
                rm.name AS reporter_mode,
                it.name AS incident_type,
                sl.name AS severity,
-               u.username
+               u.username AS reporter_username
         FROM reports r
         LEFT JOIN users u ON r.user_id = u.id
         JOIN reporter_modes rm ON r.reporter_mode_id = rm.id

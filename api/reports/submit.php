@@ -5,7 +5,7 @@ require_once(__DIR__ . '/../../db/auth_helper.php');
 require_once(__DIR__ . '/../../db/rate_limiter.php');
 
 set_cors_headers();
-rate_limit($pdo, 'submit', 10, 60);
+rate_limit($pdo, 'submit', 5, 600);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond_error("Method not allowed", 405);
@@ -50,8 +50,8 @@ $upload_token = $input['upload_token'] ?? null;
 if (!$reporter_mode_id) respond_error("Invalid reporter mode");
 if (!$incident_type_id) respond_error("Invalid incident type");
 if (!$severity_id) respond_error("Invalid severity level");
-if ($description === '' || mb_strlen($description) > 5000) {
-    respond_error("Description is required and must be under 5000 characters");
+if ($description === '' || mb_strlen($description) > 2000) {
+    respond_error("Description is required and must be under 2000 characters");
 }
 if ($latitude === false || $latitude < -90 || $latitude > 90) respond_error("Invalid latitude");
 if ($longitude === false || $longitude < -180 || $longitude > 180) respond_error("Invalid longitude");
@@ -81,8 +81,8 @@ if ($incident_date !== null && $incident_date !== '') {
 }
 
 // Validate video URL if provided
-if ($video_url !== '' && !filter_var($video_url, FILTER_VALIDATE_URL)) {
-    respond_error("Invalid video URL");
+if ($video_url && !preg_match('#^/uploads/pending/.+#', $video_url)) {
+    respond_error("Invalid video URL", 400);
 }
 if ($video_url === '') $video_url = null;
 
@@ -97,6 +97,11 @@ if (!empty($other_party_ids)) {
     if ((int)$check->fetchColumn() !== count($other_party_ids)) {
         respond_error("One or more invalid other party IDs");
     }
+}
+
+// Validate photo count
+if (is_array($photo_urls) && count($photo_urls) > 10) {
+    respond_error("Maximum 10 photos", 400);
 }
 
 // Validate upload_token if photos/video provided
@@ -200,6 +205,6 @@ try {
 }
 
 respond_success([
-    'report_id' => $report_id,
+    'id' => $report_id,
     'status' => 'pending'
 ]);

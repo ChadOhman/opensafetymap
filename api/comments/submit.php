@@ -69,6 +69,6 @@ $stmt->execute([
 ]);
 
 respond_success([
-    'comment_id' => (int)$pdo->lastInsertId(),
+    'id' => (int)$pdo->lastInsertId(),
     'status' => $status
 ]);
