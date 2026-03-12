@@ -5,6 +5,7 @@ require_once(__DIR__ . '/../../db/rate_limiter.php');
 
 set_cors_headers();
 require_role($pdo, 'moderator');
+rate_limit($pdo, 'moderate', 60, 60);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') respond_error("Method not allowed", 405);
 

@@ -1,8 +1,10 @@
 <?php
 require_once(__DIR__ . '/../../db/connect.php');
 require_once(__DIR__ . '/../../db/auth_helper.php');
+require_once(__DIR__ . '/../../db/rate_limiter.php');
 
 set_cors_headers();
+rate_limit($pdo, 'submit', 30, 60);
 $user = require_active_user($pdo);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') respond_error("Method not allowed", 405);

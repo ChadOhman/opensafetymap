@@ -9,14 +9,23 @@ rate_limit($pdo, 'moderate', 60, 60);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') respond_error("Method not allowed", 405);
 
+$page = max(1, (int)($_GET['page'] ?? 1));
+$per_page = min(100, max(1, (int)($_GET['per_page'] ?? 20)));
+$offset = ($page - 1) * $per_page;
+
 $status_filter = $_GET['status'] ?? 'pending';
+
+$count_stmt = $pdo->prepare("SELECT COUNT(*) FROM flags WHERE status = ?");
+$count_stmt->execute([$status_filter]);
+$total = (int)$count_stmt->fetchColumn();
+
 $stmt = $pdo->prepare(
     "SELECT f.*, u.username AS flagged_by
      FROM flags f
      LEFT JOIN users u ON f.user_id = u.id
      WHERE f.status = ?
      ORDER BY f.created_at DESC
-     LIMIT 100"
+     LIMIT $per_page OFFSET $offset"
 );
 $stmt->execute([$status_filter]);
 $flags = $stmt->fetchAll();
@@ -33,4 +42,9 @@ foreach ($flags as &$flag) {
     }
 }
 
-respond_success($flags);
+respond_success([
+    'flags' => $flags,
+    'page' => $page,
+    'total' => $total,
+    'total_pages' => (int)ceil($total / $per_page)
+]);
