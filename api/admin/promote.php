@@ -2,7 +2,8 @@
 require_once("../../db/connect.php");
 require_once("../../db/auth_helper.php");
 
-require_role("admin"); // Only admins can change roles
+require_role("admin");
+require_csrf();
 
 $data = json_decode(file_get_contents("php://input"), true);
 if (!isset($data['user_id']) || !isset($data['role'])) {

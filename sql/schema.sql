@@ -43,7 +43,7 @@ CREATE TABLE reports (
     photo_url VARCHAR(255) DEFAULT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     resolved_at TIMESTAMP NULL DEFAULT NULL,
-    status ENUM('pending','approved','rejected') DEFAULT 'approved',
+    status ENUM('pending','approved','rejected') DEFAULT 'pending',
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories(id),
     FOREIGN KEY (severity_id) REFERENCES severity_levels(id),
@@ -92,6 +92,17 @@ CREATE TABLE moderation_log (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (moderator_id) REFERENCES users(id)
 );
+
+-- Indexes for common query patterns
+CREATE INDEX idx_reports_status ON reports(status);
+CREATE INDEX idx_reports_user_id ON reports(user_id);
+CREATE INDEX idx_reports_timestamp ON reports(timestamp);
+CREATE INDEX idx_comments_report_id ON comments(report_id);
+CREATE INDEX idx_comments_user_id ON comments(user_id);
+CREATE INDEX idx_flags_status ON flags(status);
+CREATE INDEX idx_flags_target ON flags(target_type, target_id);
+CREATE INDEX idx_moderation_log_moderator ON moderation_log(moderator_id);
+CREATE INDEX idx_users_oauth ON users(oauth_provider, oauth_id);
 
 -- Seed data for lookups
 INSERT INTO categories (name) VALUES ('pedestrian'), ('cyclist'), ('vehicle');

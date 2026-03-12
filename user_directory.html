@@ -1,9 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Directory - Edmonton Safety Map</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<main>
 <div class="container">
   <h1>User Directory</h1>
 
   <div style="margin-bottom:10px;">
-    <input type="text" id="searchBox" placeholder="Search by name or email..." style="width:40%; padding:8px;">
-    
+    <label for="searchBox" class="sr-only">Search users</label>
+    <input type="text" id="searchBox" placeholder="Search by name or email..." aria-label="Search users" style="width:40%; padding:8px;">
+
     <label for="roleFilter">Role:</label>
     <select id="roleFilter">
       <option value="">All</option>
@@ -44,3 +55,8 @@
     <button onclick="nextPage()">Next</button>
   </div>
 </div>
+</main>
+<div aria-live="polite" id="statusMessage" class="sr-only"></div>
+<script type="module" src="assets/js/user_directory.js"></script>
+</body>
+</html>

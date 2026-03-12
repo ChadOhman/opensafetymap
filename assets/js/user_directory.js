@@ -1,7 +1,9 @@
+import { fetchJSON, escapeHTML } from "./api.js";
+
 let users = [];
 let currentRole = null;
 let currentPage = 1;
-const perPage = 10; // users per page
+const perPage = 10;
 let totalPages = 1;
 let filters = { search: "", role: "", status: "" };
 
@@ -14,7 +16,7 @@ async function loadUsers(page = 1) {
     status: filters.status
   });
 
-  const data = await fetchJSON(`/api/user/list.php?${params.toString()}`);
+  const data = await fetchJSON(`/api/users/list.php?${params.toString()}`);
   users = data.users;
   currentRole = data.current_user_role;
   currentPage = data.page;
@@ -44,13 +46,13 @@ function renderUsers(data) {
     }
 
     tr.innerHTML = `
-      <td>${user.id}</td>
-      <td>${user.name}</td>
-      <td>${user.email}</td>
-      <td>${user.oauth_provider}</td>
-      <td>${user.role}</td>
-      <td>${user.status}</td>
-      <td>${user.created_at}</td>
+      <td>${escapeHTML(user.id)}</td>
+      <td>${escapeHTML(user.name)}</td>
+      <td>${escapeHTML(user.email)}</td>
+      <td>${escapeHTML(user.oauth_provider)}</td>
+      <td>${escapeHTML(user.role)}</td>
+      <td>${escapeHTML(user.status)}</td>
+      <td>${escapeHTML(user.created_at)}</td>
       <td class="actions">${actions}</td>
     `;
 
@@ -58,21 +60,21 @@ function renderUsers(data) {
   });
 }
 
-function viewProfile(id) {
+window.viewProfile = function(id) {
   window.location.href = `/user_profile.html?id=${id}`;
-}
+};
 
-async function banUser(id) {
-  await fetchJSON("/api/user/ban.php", {
+window.banUser = async function(id) {
+  await fetchJSON("/api/users/ban.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ user_id: id })
   });
   alert("User banned.");
   loadUsers(currentPage);
-}
+};
 
-async function changeRole(id, role) {
+window.changeRole = async function(id, role) {
   await fetchJSON("/api/admin/promote.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -80,26 +82,26 @@ async function changeRole(id, role) {
   });
   alert("User role updated.");
   loadUsers(currentPage);
-}
+};
+
+window.applyFilters = function() {
+  filters.role = document.getElementById("roleFilter").value;
+  filters.status = document.getElementById("statusFilter").value;
+  loadUsers(1);
+};
+
+window.prevPage = function() {
+  if (currentPage > 1) loadUsers(currentPage - 1);
+};
+
+window.nextPage = function() {
+  if (currentPage < totalPages) loadUsers(currentPage + 1);
+};
 
 document.getElementById("searchBox").addEventListener("input", function () {
   filters.search = this.value;
   loadUsers(1);
 });
-
-function applyFilters() {
-  filters.role = document.getElementById("roleFilter").value;
-  filters.status = document.getElementById("statusFilter").value;
-  loadUsers(1);
-}
-
-function prevPage() {
-  if (currentPage > 1) loadUsers(currentPage - 1);
-}
-
-function nextPage() {
-  if (currentPage < totalPages) loadUsers(currentPage + 1);
-}
 
 // Init
 loadUsers();
