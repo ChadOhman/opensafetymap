@@ -1,124 +1,77 @@
--- Seed data for Accident Reports Platform
+-- Seed data for Open Safety Map (test/development)
 
--- Categories
-INSERT INTO categories (id, name) VALUES
-(1, 'Pedestrian'),
-(2, 'Cyclist'),
-(3, 'Motor Vehicle');
+-- Test Users
+INSERT INTO users (id, oauth_provider, oauth_id, name, email, username, role, status, privacy, created_at) VALUES
+(1, 'google', 'test-user-1', 'Alice Johnson', 'alice@example.com', 'gentle_happy_otter', 'user', 'active', 'public', NOW() - INTERVAL 30 DAY),
+(2, 'google', 'test-user-2', 'Bob Martinez', 'bob@example.com', 'quick_clever_fox', 'moderator', 'active', 'public', NOW() - INTERVAL 60 DAY),
+(3, 'google', 'test-user-3', 'Carol Chen', 'carol@example.com', 'brave_wise_owl', 'admin', 'active', 'logged-in', NOW() - INTERVAL 90 DAY);
 
--- Severity Levels
-INSERT INTO severity_levels (id, name) VALUES
-(1, 'Minor'),
-(2, 'Moderate'),
-(3, 'Severe');
+-- Test Reports (diverse reporter_modes, incident_types, severities)
+-- Report 1: Authenticated user, cyclist collision, major severity
+INSERT INTO reports (id, user_id, reporter_mode_id, incident_type_id, severity_id, description, incident_date, latitude, longitude, status, created_at) VALUES
+(1, 1, 2, 1, 2, 'Cyclist struck by turning vehicle at intersection. Driver failed to check bike lane before right turn.', NOW() - INTERVAL 14 DAY, 43.6532000, -79.3832000, 'approved', NOW() - INTERVAL 14 DAY);
 
--- Incident Types
-INSERT INTO incident_types (id, name) VALUES
-(1, 'Accident'),
-(2, 'Near Miss');
+-- Report 2: Authenticated user, pedestrian near-miss, minor severity
+INSERT INTO reports (id, user_id, reporter_mode_id, incident_type_id, severity_id, description, incident_date, latitude, longitude, status, created_at) VALUES
+(2, 1, 1, 2, 1, 'Car ran red light while I was in crosswalk. Had to jump back to the curb.', NOW() - INTERVAL 10 DAY, 40.7128000, -74.0060000, 'approved', NOW() - INTERVAL 10 DAY);
 
--- Settings
-INSERT INTO settings (id, require_approval) VALUES
-(1, 1);
+-- Report 3: Anonymous reporter, driver road-rage, major severity
+INSERT INTO reports (id, user_id, reporter_mode_id, incident_type_id, severity_id, description, incident_date, latitude, longitude, reporter_email, status, created_at) VALUES
+(3, NULL, 5, 3, 2, 'Driver aggressively tailgated me for 3 blocks then brake-checked me at the light. Felt unsafe.', NOW() - INTERVAL 7 DAY, 51.5074000, -0.1278000, 'anon-reporter@example.com', 'approved', NOW() - INTERVAL 7 DAY);
 
+-- Report 4: Authenticated user, e-scooter infrastructure-hazard, critical severity
+INSERT INTO reports (id, user_id, reporter_mode_id, incident_type_id, severity_id, description, incident_date, latitude, longitude, status, created_at) VALUES
+(4, 2, 3, 6, 3, 'Large pothole hidden by standing water on bike path. E-scooter rider thrown off, broken wrist.', NOW() - INTERVAL 5 DAY, 48.8566000, 2.3522000, 'approved', NOW() - INTERVAL 5 DAY);
 
--- Sample Admin User (replace oauth_provider and oauth_id after real OAuth login)
-INSERT INTO users (id, username, oauth_provider, oauth_id, role, status, privacy, created_at) VALUES
-(1, 'brave_wise_owl', 'google', 'sample-admin-oauth-id', 'admin', 'active', 'public', NOW());
+-- Report 5: Anonymous reporter with phone, transit-rider blocked-lane, minor severity
+INSERT INTO reports (id, user_id, reporter_mode_id, incident_type_id, severity_id, description, incident_date, latitude, longitude, reporter_phone, status, created_at) VALUES
+(5, NULL, 6, 4, 1, 'Delivery truck parked in bus lane during rush hour, forcing bus into traffic.', NOW() - INTERVAL 3 DAY, 34.0522000, -118.2437000, '555-0199', 'pending', NOW() - INTERVAL 3 DAY);
 
+-- Report 6: Authenticated user, motorcyclist running-signal, major severity
+INSERT INTO reports (id, user_id, reporter_mode_id, incident_type_id, severity_id, description, incident_date, latitude, longitude, status, created_at) VALUES
+(6, 1, 4, 5, 2, 'SUV ran a stop sign at residential intersection. I had to swerve into oncoming lane to avoid collision.', NOW() - INTERVAL 2 DAY, 49.2827000, -123.1207000, 'pending', NOW() - INTERVAL 2 DAY);
 
--- Handy Admin Snippets
+-- Report 7: Anonymous reporter, pedestrian collision, critical severity
+INSERT INTO reports (id, user_id, reporter_mode_id, incident_type_id, severity_id, description, incident_date, latitude, longitude, reporter_email, status, created_at) VALUES
+(7, NULL, 1, 1, 3, 'Elderly pedestrian hit by vehicle backing out of driveway. Paramedics called.', NOW() - INTERVAL 1 DAY, 45.4215000, -75.6972000, 'witness@example.com', 'pending', NOW() - INTERVAL 1 DAY);
 
--- Promote user to moderator
--- UPDATE users SET role='moderator' WHERE id=USER_ID;
+-- Report 8: Authenticated user, driver other incident, minor severity (rejected)
+INSERT INTO reports (id, user_id, reporter_mode_id, incident_type_id, severity_id, description, incident_date, latitude, longitude, status, created_at) VALUES
+(8, 1, 5, 7, 1, 'Test report please ignore', NOW() - INTERVAL 20 DAY, 53.5461000, -113.4938000, 'rejected', NOW() - INTERVAL 20 DAY);
 
--- Promote user to admin
--- UPDATE users SET role='admin' WHERE id=USER_ID;
+-- Report Other Parties junction entries
+INSERT INTO report_other_parties (report_id, other_party_id) VALUES
+(1, 5),  -- Report 1: motor-vehicle
+(2, 5),  -- Report 2: motor-vehicle
+(3, 5),  -- Report 3: motor-vehicle
+(4, 8),  -- Report 4: infrastructure
+(5, 6),  -- Report 5: commercial-vehicle
+(5, 7),  -- Report 5: also transit-vehicle
+(6, 5),  -- Report 6: motor-vehicle
+(7, 5),  -- Report 7: motor-vehicle
+(8, 9);  -- Report 8: none-unknown
 
--- Demote user back to regular user
--- UPDATE users SET role='user' WHERE id=USER_ID;
+-- Comments (authenticated and anonymous)
+INSERT INTO comments (id, report_id, user_id, author_name, content, status, created_at) VALUES
+(1, 1, 2, NULL, 'This intersection badly needs a protected bike lane. I have reported it to the city as well.', 'approved', NOW() - INTERVAL 13 DAY),
+(2, 1, NULL, 'Local Cyclist', 'I nearly got hit at this same spot last month. Very dangerous intersection.', 'approved', NOW() - INTERVAL 12 DAY),
+(3, 2, 3, NULL, 'We are aware of this intersection. Adding it to the review queue.', 'approved', NOW() - INTERVAL 9 DAY),
+(4, 3, NULL, 'Concerned Driver', 'I witnessed this too. The aggressive driver had a dented bumper already.', 'pending', NOW() - INTERVAL 6 DAY),
+(5, 4, 1, NULL, 'That pothole has been there for weeks. Someone was going to get hurt eventually.', 'approved', NOW() - INTERVAL 4 DAY),
+(6, 4, NULL, 'Paris Resident', 'The city filled this pothole yesterday after multiple complaints.', 'approved', NOW() - INTERVAL 2 DAY);
 
--- Ban a user
--- UPDATE users SET status='banned' WHERE id=USER_ID;
+-- Flags
+INSERT INTO flags (id, user_id, target_type, target_id, reason, status, created_at) VALUES
+(1, 1, 'report', 8, 'This appears to be a test/spam report', 'removed', NOW() - INTERVAL 19 DAY),
+(2, NULL, 'comment', 4, 'This comment contains unverified claims about the driver', 'pending', NOW() - INTERVAL 5 DAY),
+(3, 2, 'report', 7, 'May contain personally identifiable information about the victim', 'pending', NOW() - INTERVAL 1 DAY);
 
--- Unban a user
--- UPDATE users SET status='active' WHERE id=USER_ID;
+-- Moderation Log entries
+INSERT INTO moderation_log (id, moderator_id, action_type, target_type, target_id, details, notes, created_at) VALUES
+(1, 2, 'report_approve', 'report', 1, 'Approved cyclist collision report', 'Verified location matches description', NOW() - INTERVAL 13 DAY),
+(2, 2, 'report_approve', 'report', 2, 'Approved pedestrian near-miss report', NULL, NOW() - INTERVAL 9 DAY),
+(3, 3, 'report_approve', 'report', 3, 'Approved anonymous road-rage report', 'Contact info verified', NOW() - INTERVAL 6 DAY),
+(4, 2, 'report_approve', 'report', 4, 'Approved infrastructure hazard report', 'Forwarded to city works department', NOW() - INTERVAL 4 DAY),
+(5, 3, 'report_reject', 'report', 8, 'Rejected test/spam report', 'User acknowledged it was a test', NOW() - INTERVAL 19 DAY),
+(6, 2, 'flag_remove', 'report', 8, 'Removed flagged spam report', NULL, NOW() - INTERVAL 19 DAY);
 
-
--- Sample Moderator User (replace oauth_provider and oauth_id after real OAuth login)
-INSERT INTO users (id, username, oauth_provider, oauth_id, role, status, privacy, created_at) VALUES
-(2, 'quick_clever_fox', 'google', 'sample-moderator-oauth-id', 'moderator', 'active', 'public', NOW());
-
-
--- Sample Regular User (replace oauth_provider and oauth_id after real OAuth login)
-INSERT INTO users (id, username, oauth_provider, oauth_id, role, status, privacy, created_at) VALUES
-(3, 'gentle_happy_otter', 'google', 'sample-user-oauth-id', 'user', 'active', 'public', NOW());
-
-
--- Sample Reports
-INSERT INTO reports (id, user_id, category_id, severity_id, incident_type_id, description, latitude, longitude, photo_url, status, timestamp)
-VALUES
-(1, 3, 1, 2, 1, 'Pedestrian hit by car at crosswalk', 53.5461, -113.4938, NULL, 'approved', NOW() - INTERVAL 7 DAY),
-(2, 3, 2, 1, 2, 'Cyclist almost hit by turning vehicle', 53.5500, -113.5000, NULL, 'pending', NOW() - INTERVAL 2 DAY),
-(3, 3, 3, 3, 1, 'Severe vehicle collision on Jasper Ave', 53.5440, -113.4900, NULL, 'rejected', NOW() - INTERVAL 1 DAY);
-
--- Sample Comments
-INSERT INTO comments (id, user_id, report_id, content, timestamp) VALUES
-(1, 2, 1, 'This location is dangerous, I have seen multiple incidents here.', NOW() - INTERVAL 6 DAY),
-(2, 1, 1, 'Marked for city follow-up.', NOW() - INTERVAL 5 DAY);
-
--- Sample Flags
-INSERT INTO flags (id, user_id, report_id, reason, status, timestamp) VALUES
-(1, 2, 3, 'Inappropriate language in description', 'pending', NOW());
-
-
--- Sample Moderation Logs
-INSERT INTO moderation_log (id, moderator_id, action_type, target_id, details, notes, timestamp) VALUES
-(1, 2, 'report_approve', 1, 'Approved pedestrian accident report', 'Verified with city records', NOW() - INTERVAL 6 DAY),
-(2, 2, 'report_reject', 3, 'Rejected severe vehicle collision report', 'Duplicate entry of another report', NOW() - INTERVAL 12 HOUR),
-(3, 1, 'user_ban', 3, 'User banned for repeated spam reports', 'Ban lifted after appeal', NOW() - INTERVAL 3 DAY);
-
-
--- Additional Reports for Analytics Trends
-INSERT INTO reports (user_id, category_id, severity_id, incident_type_id, description, latitude, longitude, photo_url, status, timestamp, resolved_at) VALUES
-(3, 1, 1, 2, 'Near miss at 109 St crosswalk', 53.5400, -113.4900, NULL, 'approved', NOW() - INTERVAL 3 WEEK, NOW() - INTERVAL 3 WEEK + INTERVAL 1 HOUR),
-(3, 2, 2, 1, 'Cyclist clipped by mirror on Whyte Ave', 53.5200, -113.4900, NULL, 'approved', NOW() - INTERVAL 2 WEEK, NOW() - INTERVAL 2 WEEK + INTERVAL 3 HOUR),
-(3, 3, 3, 1, 'Multi-vehicle crash on Anthony Henday', 53.6000, -113.6000, NULL, 'rejected', NOW() - INTERVAL 2 WEEK, NOW() - INTERVAL 2 WEEK + INTERVAL 2 HOUR),
-(3, 1, 2, 2, 'Pedestrian almost hit turning at Jasper Ave', 53.5450, -113.4950, NULL, 'approved', NOW() - INTERVAL 1 WEEK, NOW() - INTERVAL 1 WEEK + INTERVAL 1 HOUR),
-(3, 2, 1, 1, 'Bike crash at river valley trail', 53.5300, -113.4800, NULL, 'rejected', NOW() - INTERVAL 5 DAY, NOW() - INTERVAL 5 DAY + INTERVAL 30 MINUTE),
-(3, 3, 2, 2, 'Car swerved to avoid collision downtown', 53.5500, -113.4800, NULL, 'approved', NOW() - INTERVAL 2 DAY, NOW() - INTERVAL 2 DAY + INTERVAL 2 HOUR);
-
-
--- Additional Diverse Reports for Category/Severity/Incident Testing
-INSERT INTO reports (user_id, category_id, severity_id, incident_type_id, description, latitude, longitude, photo_url, status, timestamp, resolved_at) VALUES
-(3, 1, 3, 1, 'Serious pedestrian accident at Whyte Ave crosswalk', 53.5190, -113.4970, NULL, 'approved', NOW() - INTERVAL 4 WEEK, NOW() - INTERVAL 4 WEEK + INTERVAL 2 HOUR),
-(3, 2, 1, 2, 'Cyclist near miss on High Level Bridge', 53.5340, -113.5070, NULL, 'approved', NOW() - INTERVAL 10 DAY, NOW() - INTERVAL 10 DAY + INTERVAL 1 HOUR),
-(3, 3, 2, 1, 'Two-car collision on Yellowhead Trail', 53.5700, -113.4500, NULL, 'rejected', NOW() - INTERVAL 8 DAY, NOW() - INTERVAL 8 DAY + INTERVAL 4 HOUR),
-(3, 1, 2, 2, 'Pedestrian almost hit by bus downtown', 53.5455, -113.4905, NULL, 'approved', NOW() - INTERVAL 15 DAY, NOW() - INTERVAL 15 DAY + INTERVAL 45 MINUTE),
-(3, 2, 3, 1, 'Severe bike crash at Saskatchewan Drive hill', 53.5205, -113.5055, NULL, 'pending', NOW() - INTERVAL 1 DAY, NULL),
-(3, 3, 1, 2, 'Vehicle near miss on Groat Road curve', 53.5405, -113.5355, NULL, 'pending', NOW() - INTERVAL 12 HOUR, NULL);
-
-
--- Extra Comments
-INSERT INTO comments (user_id, report_id, content, timestamp) VALUES
-(2, 4, 'I saw this incident too, very concerning.', NOW() - INTERVAL 4 WEEK),
-(1, 5, 'Marked for review by city safety team.', NOW() - INTERVAL 9 DAY),
-(3, 6, 'Driver was speeding, dangerous spot.', NOW() - INTERVAL 7 DAY),
-(2, 7, 'This crosswalk really needs better signage.', NOW() - INTERVAL 12 HOUR);
-
--- Extra Flags
-INSERT INTO flags (user_id, report_id, reason, status, timestamp) VALUES
-(1, 2, 'Potential duplicate of another report', 'pending', NOW() - INTERVAL 1 DAY),
-(2, 5, 'Description unclear / not helpful', 'pending', NOW() - INTERVAL 6 HOUR),
-(3, 6, 'Possible spam content', 'pending', NOW() - INTERVAL 2 HOUR);
-
-
--- Resolved Flags
-INSERT INTO flags (id, user_id, report_id, reason, status, timestamp) VALUES
-(4, 1, 1, 'Offensive wording in description', 'dismissed', NOW() - INTERVAL 14 DAY),
-(5, 2, 2, 'Spam content suspected', 'removed', NOW() - INTERVAL 9 DAY);
-
--- Moderation Log Entries for Resolved Flags
-INSERT INTO moderation_log (moderator_id, action_type, target_id, details, notes, timestamp) VALUES
-(2, 'flag_dismiss', 1, 'Flag dismissed as invalid', 'No offensive wording found', NOW() - INTERVAL 14 DAY),
-(1, 'flag_remove', 2, 'Flagged report removed', 'Confirmed spam report', NOW() - INTERVAL 9 DAY);

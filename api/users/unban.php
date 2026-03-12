@@ -1,19 +1,28 @@
 <?php
-require_once("../../db/connect.php");
-require_once("../../db/api_response.php");
-require_once("../../db/auth_helper.php");
+require_once(__DIR__ . '/../../db/connect.php');
+require_once(__DIR__ . '/../../db/auth_helper.php');
+require_once(__DIR__ . '/../../db/rate_limiter.php');
 
-require_role("admin");
+set_cors_headers();
+rate_limit($pdo, 'admin', 60, 60);
+$admin = require_role($pdo, 'admin');
 require_csrf();
 
-$data = json_decode(file_get_contents("php://input"), true);
-if (!isset($data['user_id'])) respond_error("Missing user_id");
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') respond_error("Method not allowed", 405);
 
-$stmt = $pdo->prepare("UPDATE users SET status='active' WHERE id=?");
-$stmt->execute([$data['user_id']]);
+$input = json_decode(file_get_contents('php://input'), true);
+$user_id = (int)($input['user_id'] ?? 0);
+if (!$user_id) respond_error("user_id required", 400);
+if ($user_id === $admin['id']) respond_error("Cannot unban yourself", 400);
 
-$pdo->prepare("INSERT INTO moderation_log (moderator_id, action_type, target_id, details, notes) 
-               VALUES (?,?,?,?,?)")
-    ->execute([$_SESSION['user_id'], "user_unban", $data['user_id'], "User unbanned", $data['notes'] ?? null]);
+$stmt = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+if (!$stmt->fetch()) respond_error("User not found", 404);
 
-respond_success(["user_id" => $data['user_id'], "status" => "active"]);
+$pdo->prepare("UPDATE users SET status = 'active' WHERE id = ?")->execute([$user_id]);
+$pdo->prepare(
+    "INSERT INTO moderation_log (moderator_id, action_type, target_type, target_id, details)
+     VALUES (?, 'user_unban', 'user', ?, 'User unbanned')"
+)->execute([$admin['id'], $user_id]);
+
+respond_success(["message" => "User unbanned"]);

@@ -22,4 +22,13 @@ try {
     die("Database connection failed. Please try again later.");
 }
 
+// Secure session configuration
+$is_prod = getenv('APP_ENV') === 'production';
+session_set_cookie_params([
+    'lifetime' => 86400,
+    'path' => '/',
+    'secure' => $is_prod,
+    'httponly' => true,
+    'samesite' => 'Lax'
+]);
 session_start();

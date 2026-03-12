@@ -10,6 +10,11 @@ services:
       DB_NAME: ${DB_NAME:-accidents}
       DB_USER: ${DB_USER:-dbuser}
       DB_PASS: ${DB_PASS:-dbpass}
+      APP_URL: http://localhost:8080
+      APP_ENV: development
+      CORS_ORIGIN: http://localhost:8080
+    volumes:
+      - uploads:/var/www/html/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -25,6 +30,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./sql/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$${MYSQL_ROOT_PASSWORD} --silent"]
       interval: 5s
@@ -35,3 +41,4 @@ services:
 
 volumes:
   db_data:
+  uploads:

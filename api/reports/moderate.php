@@ -1,21 +1,49 @@
 <?php
-require_once("../../db/connect.php");
-require_once("../../db/api_response.php");
-require_once("../../db/auth_helper.php");
+require_once(__DIR__ . '/../../db/connect.php');
+require_once(__DIR__ . '/../../db/auth_helper.php');
+require_once(__DIR__ . '/../../db/rate_limiter.php');
 
-require_role("moderator");
+set_cors_headers();
+$user = require_role($pdo, 'moderator');
 require_csrf();
+rate_limit($pdo, 'moderate', 60, 60);
 
-$data = json_decode(file_get_contents("php://input"), true);
-if (!isset($data['report_id'], $data['action'])) respond_error("Missing parameters");
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') respond_error("Method not allowed", 405);
 
-$status = $data['action'] === "approve" ? "approved" : "rejected";
+$input = json_decode(file_get_contents('php://input'), true);
+$report_id = (int)($input['report_id'] ?? 0);
+$action = $input['action'] ?? '';
+$notes = trim($input['notes'] ?? '');
 
-$stmt = $pdo->prepare("UPDATE reports SET status=?, resolved_at=NOW() WHERE id=?");
-$stmt->execute([$status, $data['report_id']]);
+if (!$report_id) respond_error("report_id required", 400);
+if (!in_array($action, ['approve', 'reject', 'resolve'])) {
+    respond_error("action must be 'approve', 'reject', or 'resolve'", 400);
+}
 
-$pdo->prepare("INSERT INTO moderation_log (moderator_id, action_type, target_id, details, notes) 
-               VALUES (?,?,?,?,?)")
-    ->execute([$_SESSION['user_id'], "report_" . $data['action'], $data['report_id'], "Report {$status}", $data['notes'] ?? null]);
+$stmt = $pdo->prepare("SELECT * FROM reports WHERE id = ?");
+$stmt->execute([$report_id]);
+$report = $stmt->fetch();
+if (!$report) respond_error("Report not found", 404);
 
-respond_success(["report_id" => $data['report_id'], "status" => $status]);
+$pdo->beginTransaction();
+try {
+    if ($action === 'approve') {
+        $pdo->prepare("UPDATE reports SET status = 'approved' WHERE id = ?")->execute([$report_id]);
+    } elseif ($action === 'reject') {
+        $pdo->prepare("UPDATE reports SET status = 'rejected' WHERE id = ?")->execute([$report_id]);
+    } elseif ($action === 'resolve') {
+        $pdo->prepare("UPDATE reports SET resolved_at = NOW() WHERE id = ?")->execute([$report_id]);
+    }
+
+    $past = ['approve' => 'approved', 'reject' => 'rejected', 'resolve' => 'resolved'][$action];
+    $pdo->prepare(
+        "INSERT INTO moderation_log (moderator_id, action_type, target_type, target_id, details, notes)
+         VALUES (?, ?, 'report', ?, ?, ?)"
+    )->execute([$user['id'], "report_$action", $report_id, "Report $past", $notes ?: null]);
+
+    $pdo->commit();
+    respond_success(["message" => "Report {$action}d"]);
+} catch (Exception $e) {
+    $pdo->rollBack();
+    respond_error("Moderation failed", 500);
+}

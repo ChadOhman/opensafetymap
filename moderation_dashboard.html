@@ -2,70 +2,214 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Moderation Dashboard</title>
-  <link rel="stylesheet" href="../assets/css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Moderation Dashboard - Open Safety Map</title>
+  <link rel="stylesheet" href="assets/css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid var(--color-border);
+      margin-bottom: var(--space-lg);
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: var(--space-sm) var(--space-lg);
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--color-text-secondary);
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 44px;
+      transition: color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+    .tab-btn:hover { color: var(--color-text); }
+    .tab-btn[aria-selected="true"] {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .mod-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-md);
+      box-shadow: var(--shadow-sm);
+    }
+    .mod-card-actions {
+      display: flex;
+      gap: var(--space-sm);
+      align-items: flex-end;
+      margin-top: var(--space-md);
+    }
+    .mod-card-actions textarea {
+      min-height: 60px;
+      flex: 1;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+    .stat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      text-align: center;
+    }
+    .stat-card .stat-number {
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+    .stat-card .stat-label {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin-top: var(--space-xs);
+    }
+    .chart-wrap {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+    .chart-wrap canvas { max-height: 400px; }
+    .admin-section {
+      margin-top: var(--space-xl);
+      padding-top: var(--space-lg);
+      border-top: 2px solid var(--color-border);
+    }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .settings-row label { flex: 0 0 200px; margin-bottom: 0; }
+    .settings-row input { flex: 1; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Moderation Dashboard</h1>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <div class="section">
-      <h2>Settings</h2>
-      <label><input type="checkbox" id="requireApproval"> Require approval before publishing reports</label>
-    </div>
+  <nav class="navbar" aria-label="Main navigation">
+    <a href="/" class="navbar-brand">Open Safety Map</a>
+    <ul class="navbar-nav">
+      <li><a href="/">Map</a></li>
+      <li><a href="report.html">Submit a Report</a></li>
+      <li><a href="moderation_dashboard.html" aria-current="page">Moderate</a></li>
+      <li id="nav-admin" hidden><a href="user_directory.html">Users</a></li>
+      <li id="nav-auth"><a href="login.html">Log In</a></li>
+      <li><button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle color theme" title="Toggle color theme">&#9681;</button></li>
+    </ul>
+  </nav>
 
-    <div class="section">
-      <h2>Pending Reports</h2>
-      <div id="reports"></div>
-    </div>
+  <main id="main-content">
+    <div class="container">
+      <h1>Moderation Dashboard</h1>
 
-    <div class="section">
-      <h2>Flagged Content</h2>
-      <div id="flags"></div>
-    </div>
-
-    <div class="section">
-      <h2>Moderation Analytics</h2>
-      <div id="analyticsSummary"></div>
-      <canvas id="trendChart" width="800" height="400"></canvas>
-    </div>
-
-    <div class="section">
-      <h2>Moderation Log</h2>
-      <div class="filters">
-        <label>Action:
-          <select id="actionFilter">
-            <option value="">All</option>
-            <option value="report_approve">Report Approved</option>
-            <option value="report_reject">Report Rejected</option>
-            <option value="user_ban">User Banned</option>
-            <option value="user_unban">User Unbanned</option>
-            <option value="flag_dismiss">Flag Dismissed</option>
-            <option value="flag_remove">Flag Removed</option>
-          </select>
-        </label>
-        <label style="margin-left:20px;">Search:
-          <input type="text" id="logSearch" placeholder="Moderator, target ID, notes...">
-        </label>
-        <label style="margin-left:20px;">Start:
-          <input type="date" id="startDate">
-        </label>
-        <label style="margin-left:10px;">End:
-          <input type="date" id="endDate">
-        </label>
+      <div class="tab-bar" role="tablist" aria-label="Dashboard tabs">
+        <button type="button" class="tab-btn" role="tab" aria-selected="true" aria-controls="tabPending" id="tabBtnPending">Pending Reports</button>
+        <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="tabFlagged" id="tabBtnFlagged">Flagged Content</button>
+        <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="tabLog" id="tabBtnLog">Moderation Log</button>
+        <button type="button" class="tab-btn" role="tab" aria-selected="false" aria-controls="tabAnalytics" id="tabBtnAnalytics">Analytics</button>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th><th>Moderator</th><th>Action</th><th>Target</th><th>Details</th><th>Notes</th><th>Timestamp</th>
-          </tr>
-        </thead>
-        <tbody id="logTableBody"></tbody>
-      </table>
-    </div>
-  </div>
 
-  <script type="module" src="../assets/js/moderation.js"></script>
+      <!-- Tab 1: Pending Reports -->
+      <div class="tab-panel active" role="tabpanel" id="tabPending" aria-labelledby="tabBtnPending">
+        <div id="pendingList"></div>
+        <p id="pendingEmpty" class="text-secondary" hidden>No pending reports.</p>
+      </div>
+
+      <!-- Tab 2: Flagged Content -->
+      <div class="tab-panel" role="tabpanel" id="tabFlagged" aria-labelledby="tabBtnFlagged">
+        <div id="flaggedList"></div>
+        <p id="flaggedEmpty" class="text-secondary" hidden>No flagged content.</p>
+      </div>
+
+      <!-- Tab 3: Moderation Log -->
+      <div class="tab-panel" role="tabpanel" id="tabLog" aria-labelledby="tabBtnLog">
+        <div class="filters">
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="logAction">Action</label>
+              <select id="logAction">
+                <option value="">All</option>
+                <option value="report_approve">Report Approved</option>
+                <option value="report_reject">Report Rejected</option>
+                <option value="user_ban">User Banned</option>
+                <option value="user_unban">User Unbanned</option>
+                <option value="flag_dismiss">Flag Dismissed</option>
+                <option value="flag_remove">Flag Removed</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="logSearch">Search</label>
+              <input type="text" id="logSearch" placeholder="Moderator, target, notes...">
+            </div>
+            <div class="form-field">
+              <label for="logStart">Start Date</label>
+              <input type="date" id="logStart">
+            </div>
+            <div class="form-field">
+              <label for="logEnd">End Date</label>
+              <input type="date" id="logEnd">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-sm" id="logFilterBtn">Apply</button>
+            <button type="button" class="btn btn-sm btn-secondary" id="logClearBtn">Clear</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Moderator</th><th>Action</th><th>Target</th><th>Details</th><th>Notes</th><th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="logPagination"></div>
+      </div>
+
+      <!-- Tab 4: Analytics -->
+      <div class="tab-panel" role="tabpanel" id="tabAnalytics" aria-labelledby="tabBtnAnalytics">
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="chart-wrap">
+          <canvas id="trendChart" aria-label="Weekly moderation trend chart" role="img"></canvas>
+        </div>
+      </div>
+
+      <!-- Admin-only settings -->
+      <div class="admin-section" id="adminSection" hidden>
+        <h2>Admin Settings</h2>
+        <div id="settingsEditor"></div>
+        <div class="form-actions" style="margin-top:var(--space-md)">
+          <button type="button" class="btn" id="saveSettingsBtn">Save Settings</button>
+        </div>
+        <div id="adminFeedback" class="alert" role="status" aria-live="polite" hidden></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="status" role="status" aria-live="polite" class="sr-only"></div>
+
+  <footer style="text-align:center;padding:var(--space-md);font-size:var(--text-xs);color:var(--color-text-secondary);">
+    Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors
+  </footer>
+
+  <script type="module" src="assets/js/moderation.js"></script>
 </body>
 </html>

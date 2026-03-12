@@ -2,20 +2,140 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>User Profile</title>
-  <link rel="stylesheet" href="../assets/css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Profile - Open Safety Map</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-xl);
+    }
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .profile-info h2 { margin-bottom: var(--space-xs); }
+    .profile-meta { font-size: var(--text-sm); color: var(--color-text-secondary); }
+    .reports-table-wrap { overflow-x: auto; }
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+    }
+    .session-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .session-info { font-size: var(--text-sm); color: var(--color-text-secondary); }
+    .session-current { font-weight: 600; color: var(--color-success); }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1 id="userName">User Profile</h1>
-    <p id="userMeta"></p>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <h2>Reports</h2>
-    <div id="reports"></div>
+  <nav class="navbar" aria-label="Main navigation">
+    <a href="/" class="navbar-brand">Open Safety Map</a>
+    <ul class="navbar-nav">
+      <li><a href="/">Map</a></li>
+      <li><a href="report.html">Submit a Report</a></li>
+      <li id="nav-moderate" hidden><a href="moderation_dashboard.html">Moderate</a></li>
+      <li id="nav-auth"><a href="login.html">Log In</a></li>
+      <li><button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle color theme" title="Toggle color theme">&#9681;</button></li>
+    </ul>
+  </nav>
 
-    <h2>Comments</h2>
-    <div id="comments"></div>
-  </div>
-  <script type="module" src="../assets/js/user_profile.js"></script>
+  <main id="main-content">
+    <div class="container">
+      <h1>My Profile</h1>
+
+      <div id="profileCard" class="profile-card">
+        <div class="profile-avatar" id="profileAvatar"></div>
+        <div class="profile-info">
+          <h2 id="profileName">Loading...</h2>
+          <p class="profile-meta" id="profileMeta"></p>
+        </div>
+      </div>
+
+      <section class="section" aria-labelledby="reportsHeading">
+        <h2 id="reportsHeading">My Reports</h2>
+        <div class="reports-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Severity</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="reportsBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="reportsPagination"></div>
+      </section>
+
+      <section class="section" aria-labelledby="settingsHeading">
+        <h2 id="settingsHeading">Settings</h2>
+        <div class="form-surface">
+          <form id="settingsForm">
+            <div class="form-field">
+              <label for="settingsUsername">Display Name</label>
+              <input type="text" id="settingsUsername" name="username" required aria-required="true">
+            </div>
+            <div class="form-field">
+              <label for="settingsPrivacy">Profile Visibility</label>
+              <select id="settingsPrivacy" name="privacy">
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+              </select>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn">Save Settings</button>
+            </div>
+            <div id="settingsFeedback" class="alert" role="status" aria-live="polite" hidden></div>
+          </form>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="sessionsHeading">
+        <h2 id="sessionsHeading">Active Sessions</h2>
+        <div id="sessionsList"></div>
+      </section>
+
+      <div class="form-actions" style="margin-top:var(--space-xl)">
+        <button type="button" class="btn btn-danger" id="logoutBtn">Log Out</button>
+      </div>
+    </div>
+  </main>
+
+  <div id="status" role="status" aria-live="polite" class="sr-only"></div>
+
+  <footer style="text-align:center;padding:var(--space-md);font-size:var(--text-xs);color:var(--color-text-secondary);">
+    Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors
+  </footer>
+
+  <script type="module" src="assets/js/user_profile.js"></script>
 </body>
 </html>
