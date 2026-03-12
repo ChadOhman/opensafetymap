@@ -1,4 +1,4 @@
-import { fetchJSON } from "./api.js";
+import { fetchJSON, escapeHTML } from "./api.js";
 
 async function loadProfile() {
   const params = new URLSearchParams(window.location.search);
@@ -14,9 +14,9 @@ async function loadProfile() {
     data.reports.forEach(r => {
       reportContainer.innerHTML += `
         <div class="card">
-          <b>Report #${r.id}</b> (${r.status})<br>
-          ${r.description}<br>
-          <small>${r.timestamp}</small>
+          <b>Report #${escapeHTML(r.id)}</b> (${escapeHTML(r.status)})<br>
+          ${escapeHTML(r.description)}<br>
+          <small>${escapeHTML(r.timestamp)}</small>
         </div>
       `;
     });
@@ -26,13 +26,13 @@ async function loadProfile() {
     data.comments.forEach(c => {
       commentContainer.innerHTML += `
         <div class="card">
-          ${c.content}<br>
-          <small>${c.timestamp}</small>
+          ${escapeHTML(c.content)}<br>
+          <small>${escapeHTML(c.timestamp)}</small>
         </div>
       `;
     });
   } catch (err) {
-    alert("❌ Failed to load profile: " + err.message);
+    alert("Failed to load profile: " + err.message);
   }
 }
 

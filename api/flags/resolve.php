@@ -4,6 +4,7 @@ require_once("../../db/api_response.php");
 require_once("../../db/auth_helper.php");
 
 require_role("moderator");
+require_csrf();
 
 $data = json_decode(file_get_contents("php://input"), true);
 if (!isset($data['flag_id'], $data['action'])) respond_error("Missing parameters");
@@ -17,12 +18,15 @@ $resolution = $data['action'] === "dismiss" ? "dismissed" : "removed";
 $pdo->prepare("UPDATE flags SET status=? WHERE id=?")->execute([$resolution, $data['flag_id']]);
 
 if ($data['action'] === "remove") {
-    if ($flag['report_id']) $pdo->prepare("DELETE FROM reports WHERE id=?")->execute([$flag['report_id']]);
-    if ($flag['comment_id']) $pdo->prepare("DELETE FROM comments WHERE id=?")->execute([$flag['comment_id']]);
+    if ($flag['target_type'] === 'report') {
+        $pdo->prepare("DELETE FROM reports WHERE id=?")->execute([$flag['target_id']]);
+    } elseif ($flag['target_type'] === 'comment') {
+        $pdo->prepare("DELETE FROM comments WHERE id=?")->execute([$flag['target_id']]);
+    }
 }
 
-$pdo->prepare("INSERT INTO moderation_log (moderator_id, action_type, target_id, details, notes) 
+$pdo->prepare("INSERT INTO moderation_log (moderator_id, action_type, target_id, details, notes)
                VALUES (?,?,?,?,?)")
-    ->execute([$_SESSION['user_id'], "flag_" . $data['action'], $flag['report_id'] ?? $flag['comment_id'], "Flag {$resolution}", $data['notes'] ?? null]);
+    ->execute([$_SESSION['user_id'], "flag_" . $data['action'], $flag['target_id'], "Flag {$resolution}", $data['notes'] ?? null]);
 
 respond_success(["flag_id" => $data['flag_id'], "resolution" => $resolution]);

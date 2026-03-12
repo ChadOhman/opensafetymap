@@ -4,6 +4,7 @@ require_once("../../db/api_response.php");
 require_once("../../db/auth_helper.php");
 
 require_role("moderator");
+require_csrf();
 
 $data = json_decode(file_get_contents("php://input"), true);
 if (!isset($data['report_id'], $data['action'])) respond_error("Missing parameters");

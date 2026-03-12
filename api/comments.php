@@ -1,4 +1,6 @@
 <?php
+// Deprecated: Use /api/comment.php instead
+header('X-Deprecated: Use /api/comment.php');
 require_once("../db/connect.php");
 require_once("../db/auth_helper.php");
 

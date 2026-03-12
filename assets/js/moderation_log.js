@@ -1,3 +1,9 @@
+function escapeHTML(str) {
+  if (str == null) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 async function fetchJSON(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error("Failed: " + url);
@@ -12,13 +18,13 @@ async function loadLogs() {
   logs.forEach(l => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-  <td>${l.id}</td>
-  <td>${l.moderator}</td>
-  <td>${l.action_type}</td>
-  <td>${l.target_id}</td>
-  <td>${l.details}</td>
-  <td>${l.notes || ""}</td>
-  <td>${l.timestamp}</td>
+  <td>${escapeHTML(l.id)}</td>
+  <td>${escapeHTML(l.moderator)}</td>
+  <td>${escapeHTML(l.action_type)}</td>
+  <td>${escapeHTML(l.target_id)}</td>
+  <td>${escapeHTML(l.details)}</td>
+  <td>${escapeHTML(l.notes || "")}</td>
+  <td>${escapeHTML(l.timestamp)}</td>
 `;
 
     tbody.appendChild(tr);

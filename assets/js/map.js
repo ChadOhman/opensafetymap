@@ -1,4 +1,4 @@
-import { fetchJSON } from "./api.js";
+import { fetchJSON, escapeHTML } from "./api.js";
 
 const map = L.map("map").setView([53.5461, -113.4938], 12);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -32,17 +32,17 @@ function showFeedback(message, tone = "") {
 
 async function loadReports() {
   try {
-    const reports = await fetchJSON("/api/reports/list.php");
+    const data = await fetchJSON("/api/reports/list.php?per_page=200");
     markers.clearLayers();
-    reports.forEach(report => {
+    data.reports.forEach(report => {
       const marker = L.marker([report.latitude, report.longitude]);
       marker.bindPopup(`
-        <b>${report.category}</b> - ${report.severity}<br>
-        ${report.incident_type}<br>
-        ${report.description}<br>
-        Status: ${report.status}<br>
-        <small>${report.timestamp}</small><br>
-        ${report.photo_url ? `<img src="${report.photo_url}" width="100" alt="Report photo">` : ""}
+        <b>${escapeHTML(report.category)}</b> - ${escapeHTML(report.severity)}<br>
+        ${escapeHTML(report.incident_type)}<br>
+        ${escapeHTML(report.description)}<br>
+        Status: ${escapeHTML(report.status)}<br>
+        <small>${escapeHTML(report.timestamp)}</small><br>
+        ${report.photo_url ? `<img src="${escapeHTML(report.photo_url)}" width="100" alt="Report photo">` : ""}
       `);
       markers.addLayer(marker);
     });
