@@ -7,5 +7,7 @@
   - Run Pa11y for layout or functionality adjustments (skip for text-only edits).
   - Run Linkinator only when links change.
 - Whenever code changes touch workflows or contributor steps, update `README.md` or related docs to keep guidance accurate.
+- Keep the Ubuntu installer turnkey: auto-detect Apache vs. Nginx and MySQL vs. MariaDB, seed the database by default, and ensure configuration uses the repository root even when run from another path.
+- Provide containerized workflows with Docker Compose that support either MySQL or MariaDB without manual tweaks.
 - Use offline-friendly validation when the network blocks npm installs: `python tools/html_checks.py <file>` and `python tools/a11y_checks.py <file>` for each modified HTML document. Prefer the standard npm-based tools when available.
 - Document the exact validation commands you execute in PR summaries to streamline reviews.

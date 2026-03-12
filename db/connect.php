@@ -7,8 +7,8 @@ $dsn = sprintf(
     getenv('DB_HOST') ?: 'localhost',
     getenv('DB_NAME') ?: 'accidents'
 );
-$user = getenv('DB_USER') ?: 'root';
-$pass = getenv('DB_PASS') ?: '';
+$user = getenv('DB_USER') ?: 'dbuser';
+$pass = getenv('DB_PASS') ?: 'dbpass';
 
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,

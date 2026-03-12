@@ -184,24 +184,55 @@ CREATE TABLE incident_types (id INT PRIMARY KEY, name VARCHAR(50));
 
 ## 🚀 Installation
 
-### 1. Clone the repo
+### Option A: Automated Ubuntu setup
+
+Run the installer from the repository root (requires `sudo`):
+
+```bash
+sudo ./install_ubuntu.sh
+```
+
+Installer options:
+
+- `--db [mysql|mariadb]` → choose the database server to install (default: auto-detects an existing install or uses `mysql`).
+- `--db-name` → database name (default: `accidents`).
+- `--db-user` / `--db-pass` → credentials that match `db/connect.php` defaults (`dbuser` / `dbpass`).
+- `--web [apache|nginx]` → choose a web server (default: auto-detects an existing install or uses `apache`).
+- `--skip-seed` → skip importing `sql/schema.sql` into the database.
+
+The script configures the chosen web server to serve this repository and seeds the database with sample data. After completion, visit [http://localhost](http://localhost).
+
+### Option B: Docker Compose (local)
+
+Launch the entire app with a single command:
+
+```bash
+docker compose up --build
+```
+
+This starts PHP/Apache on port 8080 and MySQL 8 with the full schema already seeded. Visit [http://localhost:8080](http://localhost:8080).
+
+To use MariaDB instead:
+
+```bash
+DB_IMAGE=mariadb:11 docker compose up --build
+```
+
+### Option C: Manual install
+
+#### 1. Clone the repo
 ```bash
 git clone https://github.com/ChadOhman/opensafetymap.git
 cd accident-reports
 ```
 
-### 2. Set up database
+#### 2. Set up database
 - Import schema above into MySQL
 - Add reference data for categories, severity, incident types
 - Create initial admin user manually
 
-### 3. Configure DB connection
-Edit `db/connect.php`:
-```php
-$dsn = "mysql:host=localhost;dbname=accidents;charset=utf8mb4";
-$user = "your_mysql_user";
-$pass = "your_mysql_pass";
-```
+#### 3. Configure DB connection
+Edit `db/connect.php` or set environment variables for your connection details (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`).
 
 ### 4. Configure S3
 - Update report submission API to upload photos to your S3 bucket
