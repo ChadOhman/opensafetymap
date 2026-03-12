@@ -1,16 +1,31 @@
 <?php
-require_once("../../db/connect.php");
-require_once("../../db/api_response.php");
-require_once("../../db/auth_helper.php");
+require_once(__DIR__ . '/../../db/connect.php');
+require_once(__DIR__ . '/../../db/auth_helper.php');
 
-require_role("admin");
+set_cors_headers();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $val = $pdo->query("SELECT require_approval FROM settings LIMIT 1")->fetchColumn();
-    respond_success(["require_approval" => (bool)$val]);
-} else {
-    require_csrf();
-    $data = json_decode(file_get_contents("php://input"), true);
-    $pdo->prepare("UPDATE settings SET require_approval=? WHERE id=1")->execute([(int)$data['require_approval']]);
-    respond_success(["require_approval" => (bool)$data['require_approval']]);
+    require_role($pdo, 'admin');
+    $stmt = $pdo->query("SELECT setting_key, setting_value FROM settings");
+    $settings = [];
+    foreach ($stmt->fetchAll() as $row) {
+        $settings[$row['setting_key']] = $row['setting_value'];
+    }
+    respond_success($settings);
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+    require_role($pdo, 'admin');
+    require_csrf();
+    $input = json_decode(file_get_contents('php://input'), true);
+    foreach ($input as $key => $value) {
+        $stmt = $pdo->prepare(
+            "INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)
+             ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)"
+        );
+        $stmt->execute([$key, (string)$value]);
+    }
+    respond_success(["message" => "Settings updated"]);
+}
+
+respond_error("Method not allowed", 405);
