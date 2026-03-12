@@ -30,29 +30,10 @@ Built with **PHP 8.2 + MySQL 8** backend and a **vanilla JS + Leaflet.js** front
 ## Quick Start
 
 ```bash
-git clone https://github.com/ChadOhman/opensafetymap.git
-cd opensafetymap
-cp .env.example .env
-make up
+git clone https://github.com/ChadOhman/opensafetymap.git && cd opensafetymap && cp .env.example .env && docker compose up --build -d
 ```
 
-This builds and starts Docker containers: PHP/Apache on **:8080** and MySQL 8 on **:3306**. The database is seeded with schema, lookup data, and test records automatically.
-
-Visit **http://localhost:8080**.
-
-### MariaDB Alternative
-
-```bash
-DB_IMAGE=mariadb:11 make up
-```
-
-### Ubuntu Bare-Metal Install
-
-```bash
-sudo ./install_ubuntu.sh
-```
-
-Supports `--db [mysql|mariadb]`, `--web [apache|nginx]`, `--db-name`, `--db-user`, `--db-pass`, and `--skip-seed`.
+PHP/Apache on **:8080**, MySQL 8 on **:3306**. Schema and seed data load automatically. Visit **http://localhost:8080**.
 
 ---
 
