@@ -198,25 +198,25 @@ Installer options:
 - `--db-name` → database name (default: `accidents`).
 - `--db-user` / `--db-pass` → credentials that match `db/connect.php` defaults (`dbuser` / `dbpass`).
 - `--web [apache|nginx]` → choose a web server (default: auto-detects an existing install or uses `apache`).
-- `--skip-seed` → skip importing the bundled `seed.sql` file.
+- `--skip-seed` → skip importing `sql/schema.sql` into the database.
 
 The script configures the chosen web server to serve this repository and seeds the database with sample data. After completion, visit [http://localhost](http://localhost).
 
 ### Option B: Docker Compose (local)
 
-Build and start the stack (defaults to MySQL on port 3306 and the app on 8080):
+Launch the entire app with a single command:
 
 ```bash
 docker compose up --build
 ```
 
-Use `DB_IMAGE` to switch to MariaDB or change credentials/port exposure as needed:
+This starts PHP/Apache on port 8080 and MySQL 8 with the full schema already seeded. Visit [http://localhost:8080](http://localhost:8080).
+
+To use MariaDB instead:
 
 ```bash
-DB_IMAGE=mariadb:11 DB_NAME=accidents DB_USER=dbuser DB_PASS=dbpass docker compose up --build
+DB_IMAGE=mariadb:11 docker compose up --build
 ```
-
-Access the site at [http://localhost:8080](http://localhost:8080) and the database on `localhost:3306`.
 
 ### Option C: Manual install
 

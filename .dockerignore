@@ -1,0 +1,9 @@
+.git
+.github
+.lighthouseci
+node_modules
+docker-compose.yml
+*.md
+.env
+.env.*
+!.env.example

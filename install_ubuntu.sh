@@ -192,12 +192,12 @@ provision_database() {
   $DB_CLI -e "FLUSH PRIVILEGES;"
 
   if [[ $SKIP_SEED -eq 0 ]]; then
-    local seed_path="${APP_ROOT}/seed.sql"
+    local seed_path="${APP_ROOT}/sql/schema.sql"
     if [[ -f "$seed_path" ]]; then
-      echo "Importing seed.sql into '$DB_NAME'..."
+      echo "Importing sql/schema.sql into '$DB_NAME'..."
       $DB_CLI "$DB_NAME" < "$seed_path"
     else
-      echo "seed.sql not found at ${seed_path}; skipping import." >&2
+      echo "sql/schema.sql not found at ${seed_path}; skipping import." >&2
     fi
   else
     echo "Skipping seed import as requested."
