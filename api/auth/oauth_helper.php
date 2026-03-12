@@ -137,33 +137,43 @@ function verify_bluesky_token($token, $config) {
     ];
 }
 
-function handle_oauth_login($provider, $oauthId, $name, $email, $pdo) {
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE oauth_provider=? AND oauth_id=?");
-    $stmt->execute([$provider, $oauthId]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+function handle_oauth_login($provider, $oauth_id, $name, $email, $pdo) {
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE oauth_provider = ? AND oauth_id = ?");
+    $stmt->execute([$provider, $oauth_id]);
+    $user = $stmt->fetch();
 
     if ($user) {
         if ($user['status'] === 'banned') {
-            session_destroy();
-            http_response_code(403);
-            echo json_encode(["status" => "error", "error" => "Your account has been banned."]);
-            exit;
+            respond_error("Account is banned", 403);
         }
-        $userId = $user['id'];
+        $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
+        $stmt->execute([$name, $email, $user['id']]);
+        $user['name'] = $name;
+        $user['email'] = $email;
     } else {
+        require_once(__DIR__ . '/../../db/alias_helper.php');
         $username = generate_random_username($pdo);
-        $stmt = $pdo->prepare("INSERT INTO users (oauth_provider, oauth_id, name, email, username, role, status, privacy, created_at) VALUES (?,?,?,?,?,'user','active','public',NOW())");
-        $stmt->execute([$provider, $oauthId, $name, $email, $username]);
-        $userId = $pdo->lastInsertId();
+        $stmt = $pdo->prepare(
+            "INSERT INTO users (oauth_provider, oauth_id, name, email, username) VALUES (?, ?, ?, ?, ?)"
+        );
+        $stmt->execute([$provider, $oauth_id, $name, $email, $username]);
+        $user_id = $pdo->lastInsertId();
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch();
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE id=?");
-    $stmt->execute([$userId]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    $device_name = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+    $token = create_auth_token($pdo, $user['id'], $device_name);
     $_SESSION['user_id'] = $user['id'];
-    $_SESSION['role'] = $user['role'];
-    $_SESSION['status'] = $user['status'];
 
-    return $user;
+    $safe_user = [
+        'id' => $user['id'],
+        'username' => $user['username'],
+        'name' => $user['name'],
+        'role' => $user['role'],
+        'status' => $user['status']
+    ];
+
+    return ['token' => $token, 'user' => $safe_user];
 }

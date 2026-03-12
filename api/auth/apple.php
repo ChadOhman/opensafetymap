@@ -1,18 +1,27 @@
 <?php
-require_once(__DIR__ . "/../../db/connect.php");
-require_once(__DIR__ . "/../../db/api_response.php");
-require_once(__DIR__ . "/../../db/auth_helper.php");
-require_once(__DIR__ . "/../../db/rate_limiter.php");
-require_once(__DIR__ . "/oauth_helper.php");
+require_once(__DIR__ . '/../../db/connect.php');
+require_once(__DIR__ . '/../../db/auth_helper.php');
+require_once(__DIR__ . '/../../db/rate_limiter.php');
+require_once(__DIR__ . '/oauth_helper.php');
 
-rate_limit('auth', 10, 60);
-if (!isset($_POST['id_token'])) respond_error("Missing Apple ID token");
+set_cors_headers();
+rate_limit($pdo, 'auth', 10, 600);
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    respond_error("Method not allowed", 405);
+}
+
+$input = json_decode(file_get_contents('php://input'), true);
+$id_token = $input['id_token'] ?? null;
+if (!$id_token) {
+    respond_error("id_token required", 400);
+}
+
+$config = require(__DIR__ . '/../../db/oauth_config.php');
 try {
-    $config = require(__DIR__ . '/../../db/oauth_config.php');
-    $verified = verify_oauth_token("apple", $_POST['id_token'], $config["apple"]);
-    $user = handle_oauth_login("apple", $verified['oauth_id'], $verified['name'], $verified['email'], $pdo);
-    respond_success($user);
+    $verified = verify_oauth_token('apple', $id_token, $config['apple']);
+    $result = handle_oauth_login('apple', $verified['oauth_id'], $verified['name'], $verified['email'], $pdo);
+    respond_success($result);
 } catch (Exception $e) {
-    respond_error($e->getMessage(), 500);
+    respond_error("Authentication failed: " . $e->getMessage(), 401);
 }
