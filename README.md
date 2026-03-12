@@ -1,298 +1,248 @@
-# 🚦 Edmonton Accident & Near Miss Reporting Platform
+# Open Safety Map
+
+[![CI/CD](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml/badge.svg)](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+A community-driven platform for reporting and tracking road safety incidents on an interactive map. Anyone can submit a report — with or without an account. Moderators review submissions before they appear publicly.
+
+Built with **PHP 8.2 + MySQL 8** backend and a **vanilla JS + Leaflet.js** frontend. No build tools, no bundler.
+
 ![System Overview](docs/system_overview.png)
 
-[![CI/CD](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml/badge.svg)](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/releases)
-[![Contributors](https://img.shields.io/github/contributors/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/graphs/contributors)
-[![Open Issues](https://img.shields.io/github/issues/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/issues)
-[![Open PRs](https://img.shields.io/github/issues-pr/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/pulls)
-[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://chadohman.github.io/opensafetymap/)
-[![Docs](https://img.shields.io/badge/docs-view-blue.svg)](https://chadohman.github.io/opensafetymap/)
-[![Setup Guide](https://img.shields.io/badge/setup-guide-brightgreen.svg)](https://chadohman.github.io/opensafetymap/setup/)
+---
 
+## Features
 
-[![CI/CD](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml/badge.svg)](https://github.com/ChadOhman/opensafetymap/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/releases)
-[![Contributors](https://img.shields.io/github/contributors/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/graphs/contributors)
-[![Open Issues](https://img.shields.io/github/issues/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/issues)
-[![Open PRs](https://img.shields.io/github/issues-pr/your-org/accident-reports)](https://github.com/ChadOhman/opensafetymap/pulls)
+**Reporting** — Submit incidents with reporter mode (pedestrian/cyclist/driver), incident type, severity, involved parties, photos (up to 10), and video. Click the map or use browser geolocation to set the location. Anonymous submissions accepted with email or phone for follow-up.
 
+**Interactive Map** — Leaflet.js with OpenStreetMap tiles and marker clustering. Severity-colored markers (green/orange/red). Filter by reporter mode, incident type, severity, involved party, and date range. Shareable URLs via hash coordinates.
 
-A community-driven web application for reporting, tracking, and moderating traffic-related **accidents and near misses** in Edmonton.  
-Built with **PHP + MySQL backend** and a **vanilla JS + Leaflet frontend**.
+**Dark Mode** — Three-way toggle (auto/light/dark). CSS custom properties for all colors. Map tiles swap between OpenStreetMap and CartoDB Dark Matter.
+
+**Moderation** — Tabbed dashboard for moderators: pending reports, flagged content, audit log, and analytics with weekly trend charts. All actions logged immutably.
+
+**User Management** — Admin user directory with search, role management, and ban/unban. Three roles: user, moderator, admin.
+
+**Auth** — OAuth 2.0 via Google, Apple, Mastodon, and Bluesky. Dual auth model: session cookies for web browsers, Bearer tokens for API/mobile clients.
+
+**Accessibility** — WCAG 2.1 AA targets: skip links, ARIA landmarks and live regions, keyboard navigation, 4.5:1 contrast ratios, reduced motion support, 44px minimum touch targets.
 
 ---
 
-## ✨ Features
+## Quick Start
 
-### 👥 User System
-- OAuth login via **Google, Apple, Mastodon, BlueSky**
-- Random **alias generator** (adjective + adjective + noun) for privacy
-- User roles: **user**, **moderator**, **admin**
-- Privacy settings: **public / logged-in only / private**
-- Ban enforcement (login blocked for banned users)
-- User profile pages with reports and comments
-
-### 📝 Reporting
-- Report **Accidents** or **Near Misses**
-- Categories: **Pedestrian, Cyclist, Motor Vehicle**
-- Severity levels: **Minor, Moderate, Severe**
-- Upload photos (stored in S3)
-- Status workflow: **Pending → Approved/Rejected**
-- Reports displayed on **OpenStreetMap with clustering**
-
-### 💬 Comments & Flags
-- Users can comment on reports
-- Flag system for inappropriate reports/comments
-- Moderators can **dismiss or remove** flagged content
-
-### 🛡️ Moderation
-- Unified moderation dashboard:
-  - **Pending reports** (approve/reject with notes)
-  - **Flagged content** (dismiss/remove with notes)
-  - **Settings** (require approval before publishing)
-  - **Analytics**
-  - **Moderation log**
-- Moderation log:
-  - Logs all actions (approve/reject, ban/unban, flag resolve)
-  - Immutable moderation notes
-  - Filters: by action, keyword, date range
-
-### 📊 Analytics
-- Total reports (approved, rejected, pending)
-- **Approval vs rejection trends** (weekly chart)
-- Average moderation resolution time
-- Moderator performance insights (extendable)
-
----
-
-## 🛠️ Tech Stack
-
-- **Backend:** PHP 8+, MySQL 8, PDO
-- **Frontend:** HTML5, CSS3, JavaScript (ES6 Modules)
-- **Maps:** Leaflet.js + MarkerCluster
-- **Auth:** OAuth 2.0 (Google, Apple, Mastodon, BlueSky)
-- **Storage:** Amazon S3 (photo uploads)
-
----
-
-## 📂 Project Structure
-
-```
-accident-reports/
-│── api/
-│   ├── auth/            # OAuth logins + logout
-│   ├── users/           # Profiles, roles, bans
-│   ├── reports/         # Submit, list, moderate
-│   ├── flags/           # Submit, list, resolve
-│   ├── admin/           # Settings, analytics
-│   └── moderation/      # Moderation log
-│── db/
-│   ├── connect.php      # DB connection + session
-│   ├── auth_helper.php  # Auth + role checks
-│   └── api_response.php # Unified API response helper
-│── public/
-│   ├── index.html       # Map + reporting form
-│   ├── login.html       # OAuth login
-│   ├── user_profile.html
-│   └── moderation_dashboard.html
-│── assets/
-│   ├── css/style.css    # Shared styles
-│   └── js/              # JS modules
-│       ├── api.js
-│       ├── map.js
-│       ├── report_submission.js
-│       ├── user_profile.js
-│       ├── moderation.js
-│       └── auth.js
-└── README.md
+```bash
+git clone https://github.com/ChadOhman/opensafetymap.git
+cd opensafetymap
+cp .env.example .env
+make up
 ```
 
----
+This builds and starts Docker containers: PHP/Apache on **:8080** and MySQL 8 on **:3306**. The database is seeded with schema, lookup data, and test records automatically.
 
-## 🗃️ Database Schema (Simplified)
+Visit **http://localhost:8080**.
 
-```sql
-CREATE TABLE users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(255),
-  oauth_provider VARCHAR(50),
-  oauth_id VARCHAR(255),
-  role ENUM('user','moderator','admin') DEFAULT 'user',
-  status ENUM('active','banned') DEFAULT 'active',
-  privacy ENUM('public','logged-in','private') DEFAULT 'public',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+### Useful Commands
 
-CREATE TABLE reports (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT,
-  category_id INT,
-  severity_id INT,
-  incident_type_id INT,
-  description TEXT,
-  latitude DOUBLE,
-  longitude DOUBLE,
-  photo_url TEXT,
-  status ENUM('pending','approved','rejected') DEFAULT 'pending',
-  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  resolved_at TIMESTAMP NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
-CREATE TABLE comments (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT,
-  report_id INT,
-  content TEXT,
-  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE flags (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT,
-  report_id INT NULL,
-  comment_id INT NULL,
-  reason TEXT,
-  status ENUM('pending','dismissed','removed') DEFAULT 'pending',
-  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE moderation_log (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  moderator_id INT,
-  action_type VARCHAR(50),
-  target_id INT,
-  details TEXT,
-  notes TEXT,
-  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE settings (
-  id INT PRIMARY KEY,
-  require_approval TINYINT(1) DEFAULT 1
-);
-
-CREATE TABLE categories (id INT PRIMARY KEY, name VARCHAR(50));
-CREATE TABLE severity_levels (id INT PRIMARY KEY, name VARCHAR(50));
-CREATE TABLE incident_types (id INT PRIMARY KEY, name VARCHAR(50));
+```bash
+make up          # Build and start containers
+make down        # Stop containers
+make restart     # Rebuild from scratch
+make seed        # Re-load test data
+make reset-db    # Nuke DB volumes and rebuild
+make db-shell    # MySQL shell
+make app-shell   # PHP container shell
+make lint        # PHP syntax check all files
 ```
 
----
+### MariaDB Alternative
 
-## 🚀 Installation
+```bash
+DB_IMAGE=mariadb:11 make up
+```
 
-### Option A: Automated Ubuntu setup
-
-Run the installer from the repository root (requires `sudo`):
+### Ubuntu Bare-Metal Install
 
 ```bash
 sudo ./install_ubuntu.sh
 ```
 
-Installer options:
+Supports `--db [mysql|mariadb]`, `--web [apache|nginx]`, `--db-name`, `--db-user`, `--db-pass`, and `--skip-seed`.
 
-- `--db [mysql|mariadb]` → choose the database server to install (default: auto-detects an existing install or uses `mysql`).
-- `--db-name` → database name (default: `accidents`).
-- `--db-user` / `--db-pass` → credentials that match `db/connect.php` defaults (`dbuser` / `dbpass`).
-- `--web [apache|nginx]` → choose a web server (default: auto-detects an existing install or uses `apache`).
-- `--skip-seed` → skip importing `sql/schema.sql` into the database.
+---
 
-The script configures the chosen web server to serve this repository and seeds the database with sample data. After completion, visit [http://localhost](http://localhost).
+## Tech Stack
 
-### Option B: Docker Compose (local)
+| Layer | Technology |
+|-------|-----------|
+| Backend | PHP 8.2, MySQL 8, PDO |
+| Frontend | HTML5, CSS3, JavaScript ES6 modules |
+| Maps | Leaflet.js, MarkerCluster, OpenStreetMap, CartoDB |
+| Charts | Chart.js |
+| Auth | OAuth 2.0 (Google, Apple, Mastodon, Bluesky) |
+| Storage | Amazon S3 (photo/video uploads) |
+| Geolocation | MaxMind GeoLite2 (IP fallback) |
+| Containers | Docker, Docker Compose |
 
-Launch the entire app with a single command:
+---
 
-```bash
-docker compose up --build
+## Project Structure
+
 ```
-
-This starts PHP/Apache on port 8080 and MySQL 8 with the full schema already seeded. Visit [http://localhost:8080](http://localhost:8080).
-
-To use MariaDB instead:
-
-```bash
-DB_IMAGE=mariadb:11 docker compose up --build
-```
-
-### Option C: Manual install
-
-#### 1. Clone the repo
-```bash
-git clone https://github.com/ChadOhman/opensafetymap.git
-cd accident-reports
-```
-
-#### 2. Set up database
-- Import schema above into MySQL
-- Add reference data for categories, severity, incident types
-- Create initial admin user manually
-
-#### 3. Configure DB connection
-Edit `db/connect.php` or set environment variables for your connection details (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`).
-
-### 4. Configure S3
-- Update report submission API to upload photos to your S3 bucket
-- Store `photo_url` in DB
-
-### 5. Run locally
-Use PHP’s built-in server:
-```bash
-php -S localhost:8000 -t public
-```
-
-Open [http://localhost:8000](http://localhost:8000).
-
-### 6. Offline-friendly validation
-When npm-based tooling is blocked by the network proxy, you can still run basic checks to avoid regressions:
-
-```bash
-python tools/html_checks.py index.html
-python tools/a11y_checks.py index.html
-```
-
-These scripts verify document structure, labeling, and key accessibility affordances without downloading external packages.
-
-## 📈 Automated quality checks
-
-- **CI/CD:** `.github/workflows/ci.yml` runs PHP linting and SQL schema validation on every pull request.
-- **Lighthouse CI:** `.github/workflows/lighthouse.yml` audits key pages for mobile performance, accessibility, and SEO using `.lighthouserc.json`. Note: the CI uses `staticDistDir` to serve files, so pages that depend on PHP (dynamic content, auth) will be audited as static HTML only. Run the same checks locally with:
-
-```bash
-npx lhci autorun --config=.lighthouserc.json
+opensafetymap/
+├── api/
+│   ├── auth/          # OAuth endpoints, session, tokens, CSRF, logout
+│   ├── reports/       # List, detail, submit, upload, pending, moderate
+│   ├── comments/      # Submit comments
+│   ├── flags/         # Submit, list, resolve
+│   ├── moderation/    # Audit log, stats
+│   ├── users/         # Profile, settings, reports, list, ban/unban, role
+│   ├── admin/         # Key-value settings
+│   ├── location/      # IP geolocation
+│   └── lookups.php    # All dropdown values
+├── db/
+│   ├── connect.php        # PDO connection + session config
+│   ├── auth_helper.php    # Dual auth, CSRF, CORS, honeypot, role checks
+│   ├── api_response.php   # {success, data} / {success, error, code} envelope
+│   ├── rate_limiter.php   # IP-based rate limiting via DB
+│   ├── env_loader.php     # .env file parser
+│   ├── alias_helper.php   # Random username generator
+│   ├── oauth_config.php   # Provider credentials
+│   └── s3_config.php      # S3 credentials
+├── assets/
+│   ├── css/style.css      # Custom properties, dark/light mode, responsive
+│   └── js/
+│       ├── api.js         # Fetch wrapper, Bearer tokens, CSRF, escapeHTML
+│       ├── auth.js        # Session check, role helpers, OAuth handling
+│       ├── theme.js       # Dark/light/auto cycling
+│       ├── geolocation.js # Browser → IP → cache → world view
+│       ├── map.js         # Main map page logic
+│       ├── report-form.js # Report submission form
+│       ├── moderation.js  # Moderation dashboard
+│       ├── user_profile.js
+│       └── user_directory.js
+├── sql/
+│   ├── schema.sql     # 16 tables + indexes + seed lookup data
+│   └── seed.sql       # Test data (3 users, 8 reports, comments, flags)
+├── docker/
+│   └── Dockerfile
+├── docker-compose.yml
+├── Makefile
+├── .env.example
+└── *.html             # 6 pages: index, report, login, profile, moderation, directory
 ```
 
 ---
 
-## 🔒 Roles & Permissions
+## Database
 
-- **User** → Submit reports, comment, flag content  
-- **Moderator** → Moderate reports & flags, add notes  
-- **Admin** → All moderator actions + manage settings, roles, bans  
+16 tables organized into:
 
----
+- **Auth**: `users`, `auth_tokens`
+- **Lookups**: `reporter_modes`, `other_parties`, `incident_types`, `severity_levels`
+- **Content**: `reports`, `report_other_parties` (junction), `report_photos`, `comments`, `flags`
+- **Upload**: `upload_tokens`
+- **Admin**: `settings` (key-value), `moderation_log`, `rate_limits`
 
-## 📌 Roadmap
+Reports have a nullable `user_id` (anonymous submissions), many-to-many relationship with `other_parties`, and multiple photos via `report_photos`.
 
-- [ ] Moderator performance analytics (leaderboard)  
-- [ ] Email notifications for approvals/rejections  
-- [ ] Map heatmap visualization of reports  
-- [ ] Export moderation logs to CSV/Excel  
-
----
-
-## 🧑‍💻 Contributors
-
-- Backend: PHP/MySQL  
-- Frontend: JS/Leaflet  
-- Maintainer: *Your Name*  
+Full schema: [`sql/schema.sql`](sql/schema.sql)
 
 ---
 
-## 📜 License
+## API
 
-MIT License.  
-Free to use, modify, and distribute.  
+All endpoints return a consistent JSON envelope:
+
+```json
+// Success
+{ "success": true, "data": { ... } }
+
+// Error
+{ "success": false, "error": "Message", "code": 400 }
+```
+
+### Public Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/lookups.php` | All lookup table values |
+| GET | `/api/reports/list.php?bbox=...` | Reports in bounding box (paginated) |
+| GET | `/api/reports/detail.php?id=...` | Single report with photos, comments |
+| GET | `/api/location/detect.php` | IP-based geolocation |
+| GET | `/api/auth/csrf.php` | Get CSRF token |
+| GET | `/api/users/profile.php?username=...` | Public profile (respects privacy) |
+
+### Authenticated Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/reports/submit.php` | Submit report (auth or anonymous) |
+| POST | `/api/reports/upload.php` | Upload photo/video |
+| POST | `/api/comments/submit.php` | Add comment |
+| POST | `/api/flags/submit.php` | Flag content |
+| GET | `/api/auth/session.php` | Current user info |
+| GET | `/api/auth/tokens.php` | List active tokens |
+| DELETE | `/api/auth/tokens.php?id=...` | Revoke token |
+| POST | `/api/auth/logout.php` | Logout |
+| PUT | `/api/users/settings.php` | Update own settings |
+| GET | `/api/users/reports.php` | Own reports |
+
+### Moderator Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/reports/pending.php` | Pending reports queue |
+| POST | `/api/reports/moderate.php` | Approve/reject/resolve report |
+| GET | `/api/flags/list.php` | Flagged content |
+| POST | `/api/flags/resolve.php` | Dismiss/remove flagged item |
+| GET | `/api/moderation/log.php` | Filterable audit log |
+| GET | `/api/moderation/stats.php` | Moderation analytics |
+
+### Admin Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/users/list.php` | User directory (search/filter) |
+| POST | `/api/users/ban.php` | Ban user |
+| POST | `/api/users/unban.php` | Unban user |
+| POST | `/api/users/role.php` | Change user role |
+| GET/PUT | `/api/admin/settings.php` | App settings |
+
+---
+
+## Configuration
+
+Copy `.env.example` to `.env` and fill in:
+
+- **Database**: `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`
+- **App**: `APP_URL`, `APP_ENV` (development/production), `CORS_ORIGIN`
+- **OAuth**: Client ID + secret for each provider (Google, Apple, Mastodon, Bluesky)
+- **S3**: `S3_BUCKET`, `S3_KEY`, `S3_SECRET`, `S3_REGION`
+- **Geolocation**: `MAXMIND_DB_PATH` (optional, for IP-based location fallback)
+
+---
+
+## CI/CD
+
+- **PHP Lint**: Checks all `.php` files for syntax errors on every push and PR
+- **SQL Validation**: Verifies schema syntax
+- **Lighthouse CI**: Audits pages for performance, accessibility, and SEO (static HTML only)
+
+---
+
+## Roles & Permissions
+
+| Role | Capabilities |
+|------|-------------|
+| **User** | Submit reports, comment, flag content, manage own profile |
+| **Moderator** | All user actions + approve/reject reports, resolve flags, view audit log and analytics |
+| **Admin** | All moderator actions + manage user roles, ban/unban users, app settings, user directory |
+
+Anonymous visitors can submit reports and comments without an account.
+
+---
+
+## License
+
+[MIT](LICENSE)
