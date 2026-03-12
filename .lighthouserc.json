@@ -2,12 +2,13 @@
   "ci": {
     "collect": {
       "staticDistDir": ".",
-      "numberOfRuns": 1,
+      "numberOfRuns": 3,
       "url": [
         "/index.html",
         "/login.html",
         "/user_profile.html",
-        "/moderation_dashboard.html"
+        "/moderation_dashboard.html",
+        "/user_directory.html"
       ],
       "settings": {
         "formFactor": "mobile",

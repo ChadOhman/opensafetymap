@@ -228,7 +228,7 @@ These scripts verify document structure, labeling, and key accessibility afforda
 ## 📈 Automated quality checks
 
 - **CI/CD:** `.github/workflows/ci.yml` runs PHP linting and SQL schema validation on every pull request.
-- **Lighthouse CI:** `.github/workflows/lighthouse.yml` audits key pages for mobile performance, accessibility, and SEO using `.lighthouserc.json`. Run the same checks locally with:
+- **Lighthouse CI:** `.github/workflows/lighthouse.yml` audits key pages for mobile performance, accessibility, and SEO using `.lighthouserc.json`. Note: the CI uses `staticDistDir` to serve files, so pages that depend on PHP (dynamic content, auth) will be audited as static HTML only. Run the same checks locally with:
 
 ```bash
 npx lhci autorun --config=.lighthouserc.json
