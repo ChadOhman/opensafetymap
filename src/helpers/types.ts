@@ -124,7 +124,7 @@ declare module 'express-session' {
   }
 }
 
-declare module 'express' {
+declare module 'express-serve-static-core' {
   interface Request {
     authMethod?: 'token' | 'session' | null;
     currentUser?: User | null;
