@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Open Safety Map</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+" crossorigin="anonymous">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <nav class="navbar" aria-label="Main navigation">
+    <a href="/" class="navbar-brand">Open Safety Map</a>
+    <ul class="navbar-nav">
+      <li><a href="report.html">Submit a Report</a></li>
+      <li id="nav-moderate" hidden><a href="moderation_dashboard.html">Moderate</a></li>
+      <li id="nav-auth"><a href="login.html">Log In</a></li>
+      <li><button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle color theme" title="Toggle color theme">&#9681;</button></li>
+    </ul>
+  </nav>
+
+  <main id="main-content">
+    <div class="map-layout">
+      <aside class="filter-panel" id="filterPanel" aria-label="Filter reports">
+        <div class="filter-panel-header">
+          <h2>Filters</h2>
+          <button type="button" class="btn btn-sm btn-secondary" id="filterCloseBtn" aria-label="Close filters">&times;</button>
+        </div>
+        <form id="filterForm">
+          <fieldset>
+            <legend class="sr-only">Report filters</legend>
+
+            <div class="form-field">
+              <label for="filterMode">Reporter Mode</label>
+              <select id="filterMode" name="reporter_mode">
+                <option value="">All</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="filterType">Incident Type</label>
+              <select id="filterType" name="incident_type">
+                <option value="">All</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="filterSeverity">Severity</label>
+              <select id="filterSeverity" name="severity">
+                <option value="">All</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="filterParty">Other Party</label>
+              <select id="filterParty" name="other_party">
+                <option value="">All</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="filterDateFrom">Date From</label>
+              <input type="date" id="filterDateFrom" name="date_from">
+            </div>
+
+            <div class="form-field">
+              <label for="filterDateTo">Date To</label>
+              <input type="date" id="filterDateTo" name="date_to">
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn">Apply Filters</button>
+              <button type="reset" class="btn btn-secondary" id="filterClearBtn">Clear</button>
+            </div>
+          </fieldset>
+        </form>
+      </aside>
+
+      <div id="map" role="application" aria-label="Safety incident map"></div>
+
+      <aside class="detail-panel" id="detailPanel" aria-label="Report details" hidden>
+        <div class="detail-panel-header">
+          <h2 id="detailTitle">Report Details</h2>
+          <button type="button" class="btn btn-sm btn-secondary" id="detailCloseBtn" aria-label="Close details">&times;</button>
+        </div>
+        <div id="detailContent"></div>
+      </aside>
+    </div>
+
+    <button type="button" class="btn btn-sm filter-toggle-btn" id="filterToggleBtn" aria-label="Toggle filters">Filters</button>
+  </main>
+
+  <div id="status" role="status" aria-live="polite" class="sr-only"></div>
+
+  <footer class="site-footer">
+    Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin="anonymous"></script>
+  <script type="module" src="assets/js/map.js"></script>
+</body>
+</html>

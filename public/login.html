@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log In - Open Safety Map</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <nav class="navbar" aria-label="Main navigation">
+    <a href="/" class="navbar-brand">Open Safety Map</a>
+    <ul class="navbar-nav">
+      <li><a href="/">Map</a></li>
+      <li><a href="report.html">Submit a Report</a></li>
+      <li><button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle color theme" title="Toggle color theme">&#9681;</button></li>
+    </ul>
+  </nav>
+
+  <main id="main-content">
+    <div class="login-container">
+      <div class="login-surface">
+        <h1>Log In</h1>
+        <p class="login-intro">Sign in to submit reports, track your submissions, and participate in the community.</p>
+
+        <div class="oauth-buttons">
+          <a href="/api/auth/google" class="oauth-btn oauth-google" id="btnGoogle">
+            <span class="oauth-icon" aria-hidden="true">G</span>
+            Continue with Google
+          </a>
+          <a href="/api/auth/apple" class="oauth-btn oauth-apple" id="btnApple">
+            <span class="oauth-icon" aria-hidden="true">&#63743;</span>
+            Continue with Apple
+          </a>
+          <a href="/api/auth/mastodon" class="oauth-btn oauth-mastodon" id="btnMastodon">
+            <span class="oauth-icon" aria-hidden="true">M</span>
+            Continue with Mastodon
+          </a>
+          <a href="/api/auth/bluesky" class="oauth-btn oauth-bluesky" id="btnBluesky">
+            <span class="oauth-icon" aria-hidden="true">B</span>
+            Continue with Bluesky
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="status" role="status" aria-live="polite" class="sr-only"></div>
+
+  <footer style="text-align:center;padding:var(--space-md);font-size:var(--text-xs);color:var(--color-text-secondary);">
+    Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors
+  </footer>
+
+  <script type="module">
+    import { initTheme, cycleTheme } from './assets/js/theme.js';
+
+    initTheme();
+    document.getElementById('themeToggle').addEventListener('click', () => cycleTheme());
+
+    // Store returnUrl and append to OAuth links
+    const params = new URLSearchParams(window.location.search);
+    const returnUrl = params.get('returnUrl') || params.get('return') || '/';
+    document.querySelectorAll('.oauth-btn').forEach(btn => {
+      const url = new URL(btn.href, window.location.origin);
+      url.searchParams.set('returnUrl', returnUrl);
+      btn.href = url.toString();
+    });
+  </script>
+</body>
+</html>

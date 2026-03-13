@@ -1,19 +1,25 @@
-FROM php:8.2-apache
+# Build stage
+FROM node:20 AS builder
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci
+COPY tsconfig.json ./
+COPY src/ ./src/
+RUN npm run build
 
-RUN docker-php-ext-install pdo pdo_mysql \
-  && a2enmod rewrite
+# Runtime stage
+FROM node:20-slim
+WORKDIR /app
 
-# Configure PHP for large uploads
-RUN echo "upload_max_filesize = 110M" > /usr/local/etc/php/conf.d/uploads.ini \
-  && echo "post_max_size = 120M" >> /usr/local/etc/php/conf.d/uploads.ini \
-  && echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/uploads.ini
+COPY package.json package-lock.json* ./
+RUN npm ci --omit=dev
 
-WORKDIR /var/www/html
-COPY . /var/www/html
+COPY --from=builder /app/dist ./dist
+COPY public/ ./public/
+COPY sql/ ./sql/
 
-RUN chown -R www-data:www-data /var/www/html \
-  && mkdir -p /var/www/html/uploads/pending \
-  && chown www-data:www-data /var/www/html/uploads/pending
+RUN mkdir -p /app/uploads/pending && chown -R node:node /app/uploads
 
-EXPOSE 80
-CMD ["apache2-foreground"]
+USER node
+EXPOSE 8080
+CMD ["node", "dist/index.js"]
